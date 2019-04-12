@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Activités{% endblock %}
+
+{% block body %}
+
+    <div class="jumbotron flex">
+        <h1 class="d-inline">Activités</h1>
+        {% if perso == true %}
+            {% if is_granted('ROLE_PROFESSEUR') %}
+                <div>
+                    <a href="{{ path('new_activity') }}" class="btn btn-success pull-right">Créer une activité</a>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="container">
+                {{ form_start(form_activity) }}
+                <div class="form-row">
+                    <div class="col-12 col-sm-3 col-md-3 col-lg-3">
+                        {{ form_row(form_activity.creator_name) }}
+                    </div>
+                    <div class="col-12 col-sm-3 col-md-3 col-lg-3">
+                        {{ form_row(form_activity.activity_name) }}
+                    </div>
+                    <div class="col-12 col-sm-4 col-md-4 col-lg-4">
+                        <button class="btn btn-primary">Rechercher</button>
+                        {% if is_granted('ROLE_PROFESSEUR') %}
+                            <a href="{{ path('new_activity') }}" class="btn btn-success pull-right">Créer une activité</a>
+                        {% endif %}
+                    </div>
+                </div>
+                {{ form_end(form_activity) }}
+            </div>
+        {% endif %}
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+
+    <div class="m-3">
+        <div class="row flex">
+
+            {% for activite in activites %}
+                <div class="col-xs-4 col-lg-4 col-md-4 mb-3" >
+                        <div class="card h-100">
+                            {% if activite.fileName %}
+                                <img class="card-img-top" src="{{ vich_uploader_asset(activite, 'imageFile') }}" alt="Card image cap" style="width: 100%; height: auto">
+                            {% else %}
+                                <img class="card-img-top mt-5 mb-5" src="/images/activity/activity.png" alt="Card image cap" style="width: 100%; height: auto">
+                            {% endif %}
+                            <div class="card-body text-center">
+                                <h3 class="card-title mb-3">{{ activite.name }}</h3>
+                                <div class="text-center">
+                                    <a href="{{ path('activity_' ~ activite.type.name, {'id': activite.id}) }}" class="btn btn-primary">Effectuer</a>
+                                    {% if is_granted('ROLE_PROFESSEUR') and perso == true %}
+                                        <a href="{{ path('edit_activity', {'id' : activite.id}) }}" class="btn btn-warning m-1">Modifier l'activité</a>
+                                        <a href="{{ path('activity_delete', {'id': activite.id}) }}" class="btn btn-danger">Supprimer</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+{% endblock %}

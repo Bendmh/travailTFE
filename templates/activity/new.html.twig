@@ -1,0 +1,67 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form_act 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}Activité{% endblock %}
+
+{% block body %}
+
+    <div class="jumbotron">
+        <h1>{% if(activity.id) %}Modification de l'{% else %}Création d'une {% endif %}activité</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-7 col-md-7">
+
+
+                {{ form_start(form_act) }}
+
+                {{ form_row(form_act.name, {
+                    'attr' : {
+                        'placeholder' : "Quelle est le nom de l'activité (obligatoire)"
+                    },
+                    'label' : 'Nom de l\'activité'
+                }) }}
+
+                {{ form_row(form_act.imageFile, {
+                    'attr' : {
+                        'placeholder' : "Ajouter une image (facultative)"
+                    },
+                    'label' : 'Image pour l\'activité'
+                }) }}
+
+                {% if(activity.id) %}
+                    {{ form_row(form_act.type, {
+                        'attr' : {
+                            'placeholder' : "Type d'activité",
+                            'disabled' : "disabled"
+                        },
+                        'label' : 'Type d\'activité'
+                    }) }}
+                {% else %}
+                    {{ form_row(form_act.type, {
+                        'attr' : {
+                            'placeholder' : "Type d'activité",
+                        },
+                        'label' : 'Type d\'activité'
+                    }) }}
+                {% endif %}
+
+                {{ form_row(form_act.visible, {
+                    'attr' : {
+                        'placeholder' : "Activité visible dans la liste"
+                    }
+                }) }}
+
+                <button type="submit" class="btn btn-success">{% if(activity.id) %}Appliquer les modifications{% else %}Ajouter des questions{% endif %}</button>
+
+                {{ form_end(form_act) }}
+            </div>
+        </div>
+    </div>
+
+
+
+
+
+{% endblock %}

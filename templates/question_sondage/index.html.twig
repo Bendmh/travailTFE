@@ -1,0 +1,74 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form_quest 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}Questions sondage{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>{{ activity.name }}</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-9 col-lg-9 col-md-9">
+                {{ form_start(form_quest) }}
+
+                {{ form_row(form_quest.question, {
+                    'attr' : {
+                        'placeholder' : "Quelle est votre question ? (obligatoire)"
+                    },
+                    'label' : 'Question posée'
+                }) }}
+            </div>
+            <div class=" col-6 col-lg-6 col-md-6">
+
+                {{ form_row(form_quest.choix1, {
+                    'attr' : {
+                        'placeholder' : "Choix numéro 1 (obligatoire)"
+                    },
+                    'label' : 'Choix 1'
+                }) }}
+
+                {{ form_row(form_quest.choix2, {
+                    'attr' : {
+                        'placeholder' : "Choix numéro 2 (obligatoire)"
+                    },
+                    'label' : 'Choix 2'
+                }) }}
+
+            </div>
+            <div class=" col-6 col-lg-6 col-md-6">
+                {{ form_row(form_quest.choix3, {
+                    'attr' : {
+                        'placeholder' : "Choix numéro 3 (facultative)"
+                    },
+                    'label' : 'Choix 3'
+                }) }}
+
+                {{ form_row(form_quest.choix4, {
+                    'attr' : {
+                        'placeholder' : "Choix numéro 4 (facultative)"
+                    },
+                    'label' : 'Choix 4'
+                }) }}
+
+
+                {{ form_row(form_quest.choix5, {
+                    'attr' : {
+                        'placeholder' : "Choix numéro 5 (facultative)"
+                    },
+                    'label' : 'choix 5'
+                }) }}
+            </div>
+
+            <div class="col-12 col-lg-12 col-md-12">
+
+                <button type="submit" class="btn btn-primary">Terminer</button>
+                {{ form_end(form_quest) }}
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}

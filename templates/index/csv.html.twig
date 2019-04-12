@@ -1,0 +1,25 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Import CSV{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Importer vos CSV</h1>
+    </div>
+    {% for message in app.flashes('error') %}
+        <div class="alert alert-danger">
+            {{ message }}
+        </div>
+    {% endfor %}
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-7 col-md-7">
+                
+                {{ form_start(form_csv) }}
+
+                    <button class="btn btn-success">Envoyer</button>
+                {{ form_end(form_csv) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

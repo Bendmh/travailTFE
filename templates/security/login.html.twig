@@ -1,0 +1,31 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Connexion{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Connexion</h1>
+    </div>
+    <div class="container">
+        <div class="col-xs-12 col-lg-7 col-md-7">
+            {% if error %}
+                <div class="alert alert-danger">
+                    Pseudo ou mot de passe incorrect
+                </div>
+            {% endif %}
+            <form action="{{ path('security_login') }}" method="post">
+                <div class="form-group">
+                    <label>Pseudo</label>
+                    <input placeholder="Pseudo ..." type="text" required name="_username" class="form-control" value="{{ lastUsername }}">
+                </div>
+                <div class="form-group">
+                    <label>Mot de passe</label>
+                    <input placeholder="Password ..." type="password" required name="_password" class="form-control">
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-success">Connexion</button>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

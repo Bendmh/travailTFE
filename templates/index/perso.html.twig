@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page perso{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Ma page</h1>
+    </div>
+    <div class="container">
+
+        <div class="text-center">Vous êtes libre de changer votre nom, prénom et pseudo</div>
+
+
+        {{ form_start(form_user) }}
+        {{ form_row(form_user.nom) }}
+        {{ form_row(form_user.prenom) }}
+        {{ form_row(form_user.pseudo) }}
+        <div class="form-group">
+            <label for="userRole">Rôle</label>
+            {% set role = user.titre | split('_') %}
+            <input type="text" id="userRole" value='{{ role[1] | capitalize }}{% if role[2] is defined %} {{ role[2] | capitalize }} {% endif %}' disabled class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="userClasses">Classes</label></br>
+            <select name="userClasses" id="userClasses" class="w-100" disabled multiple>
+                {% for classe in user.classes %}
+                    <option value="{{ classe.nom }}" selected>{{ classe.nom }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="text-center">
+            <a href="#"><button class="btn btn-primary">Modifier</button></a>
+        </div>
+        {{ form_end(form_user) }}
+
+
+        {#{{ form_end(form_user) }}#}
+        {#<div class="col-12 col-lg-7 col-md-7">
+
+            <div class="input-group input-group-lg">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Nom : </span>
+                </div>
+                <input type="text" value={{ user.nom }} disabled class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+            </div>
+            <br/>
+            <div class="input-group input-group-lg">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Prénom : </span>
+                </div>
+                <input type="text" value={{ user.prenom }} disabled class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+            </div>
+            <br/>
+            <div class="input-group input-group-lg">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Pseudo : </span>
+                </div>
+                <input type="text" value={{ user.pseudo }} disabled class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+            </div>
+            <br/>
+            <div class="input-group input-group-lg">
+                <div class="input-group-prepend">
+                    <span class="input-group-text">Rôle : </span>
+                </div>
+                {% set role = user.titre | split('_') %}
+                <input type="text" value={{ role[1] | capitalize }} disabled class="form-control" aria-label="Sizing example input" aria-describedby="inputGroup-sizing-lg">
+            </div>
+            <br/>
+            <div class="text-center">
+                <a href="#"><button class="btn btn-primary">Editer</button></a>
+            </div>
+
+        </div>#}
+    </div>
+{% endblock %}

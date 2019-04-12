@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Import CSV{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Exporter en CSV</h1>
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-7 col-md-7">
+
+                {{ form_start(form_csv) }}
+
+                {{ form_row(form_csv.name, {
+                    'attr' : {
+                        'placeholder' : "Quelle est le nom de l'export (obligatoire)"
+                    },
+                    'label' : 'Nom',
+                    'required' : true
+                }) }}
+
+                <button class="btn btn-success">Envoyer et Télécharger</button>
+                {{ form_end(form_csv) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

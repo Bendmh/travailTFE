@@ -1,0 +1,28 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Page de test{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Activité regroupement</h1>
+    </div>
+
+    <div class="container">
+        {{ form_start(form) }}
+
+        {{ form_row(form.name) }}
+
+        <ul class="response" data-prototype="{{ form_widget(form.questionsReponses.vars.prototype) | escape }}">
+
+        </ul>
+
+        <button type="submit" class="btn btn-primary">Ajouter un groupe</button>
+        <a href="{{ path('activity_' ~ activity.type.name, {'id' : activity.id}) }}" class="btn btn-success">Terminer</a>
+        {{ form_end(form) }}
+    </div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/JS/questionsGroupes.js"></script>
+{% endblock %}

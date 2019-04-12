@@ -1,0 +1,34 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Regroupement{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Association</h1>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-xs-12 col-lg-7 col-md-7 text-center">
+                <h3 class="result"></h3>
+                <h4 class="enonce mb-4">Associe chaque élément au bon groupe.</h4>
+                {% for answer in answers | shuffle() %}
+                    <h3 class="response {{ answer.question.name }}">{{ answer.name }}</h3>
+                {% endfor %}
+                {% for question in activity.questionsGroupes %}
+                    {% set class = question.name %}
+                    <button class="btn btn-primary groups w-100 mb-3 {{ question.name }}">{{ question.name }}</button>
+                {% endfor %}
+                <a href="{{ path('correction_groups', { 'id' : activity.id}) }}" class="final d-none">final</a>
+            </div>
+        </div>
+    </div>
+
+
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+    <script src="/JS/groupementEleve.js"></script>
+{% endblock %}

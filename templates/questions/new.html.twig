@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form_quest 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}Questions{% endblock %}
+
+{% block body %}
+
+
+    <div class="jumbotron">
+        <h1>{{ activity.name }}</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-9 col-lg-9 col-md-9">
+                {{ form_start(form_quest) }}
+
+                {{ form_row(form_quest.question, {
+                    'attr' : {
+                        'placeholder' : "Quelle est votre question ? (obligatoire)"
+                    },
+                    'label' : 'Question posée'
+                }) }}
+            </div>
+            <div class=" col-6 col-lg-6 col-md-6">
+
+                {{ form_row(form_quest.imageFile, {
+                    'attr' : {
+                        'placeholder' : "Ajouter une image (facultatif)"
+                    },
+                    'label' : 'Image'
+                }) }}
+
+
+                {{ form_row(form_quest.bonneReponse_1, {
+                    'attr' : {
+                        'placeholder' : "Bonne réponse à la question (obligatoire)"
+                    },
+                    'label' : 'Bonne réponse 1'
+                }) }}
+                {{ form_row(form_quest.bonneReponse_2, {
+                    'attr' : {
+                        'placeholder' : "Bonne réponse à la question (facultative)"
+                    },
+                    'label' : 'Bonne réponse 2'
+                }) }}
+                {{ form_row(form_quest.bonneReponse_3, {
+                    'attr' : {
+                        'placeholder' : "Bonne réponse à la question (facultative)"
+                    },
+                    'label' : 'Bonne réponse 3'
+                }) }}
+
+            </div>
+            <div class=" col-6 col-lg-6 col-md-6">
+
+                {{ form_row(form_quest.points, {
+                    'attr' : {
+                        'placeholder' : "Donner un total de points (obligatoire)"
+                    },
+                    'label' : 'Points'
+                }) }}
+
+                {{ form_row(form_quest.mauvaiseReponse_1, {
+                    'attr' : {
+                        'placeholder' : "Mauvaise réponse à la question (obligatoire)"
+                    },
+                    'label' : 'Mauvaise réponse 1'
+                }) }}
+                {{ form_row(form_quest.mauvaiseReponse_2, {
+                    'attr' : {
+                        'placeholder' : "Mauvaise réponse à la question (facultative)"
+                    },
+                    'label' : 'Mauvaise réponse 2'
+                }) }}
+                {{ form_row(form_quest.mauvaiseReponse_3, {
+                    'attr' : {
+                        'placeholder' : "Mauvaise réponse à la question (facultative)"
+                    },
+                    'label' : 'Mauvaise réponse 3'
+                }) }}
+
+
+            </div>
+
+            <div class="col-12 col-lg-12 col-md-12">
+
+                <button type="submit" class="btn btn-primary">{% if(question.id) %}Appliquer les modifications{% else %}Ajouter la question{% endif %}</button>
+                {% if not(question.id) %}<a href="{{ path('activity_' ~ activity.type.name, {'id' : activity.id}) }}" class="btn btn-success">Terminer</a>{% endif %}
+
+                {{ form_end(form_quest) }}
+            </div>
+
+        </div>
+    </div>
+
+
+{% endblock %}

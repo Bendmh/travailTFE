@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Inscription sur le site</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-7 col-md-7">
+                {{ form_start(form_register) }}
+                {{ form_widget(form_register) }}
+
+                <button type="submit" class="btn btn-success">Inscription</button>
+                {{ form_end(form_register) }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

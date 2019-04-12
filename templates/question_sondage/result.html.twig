@@ -1,0 +1,30 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réponses sondage{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Résultat {{ questionSondage.question }}</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-4 col-lg-4 col-md-4 text-right">
+                {% for result in results %}
+                    <p>{{ result['response'] }} : {{ result[1] }}</p>
+                {% endfor %}
+                <p>Total : {{ total }}</p>
+            </div>
+            <div class="col-8 col-lg-8 col-md-8">
+                <div id="div_chart"></div>
+
+                <script type="text/javascript" src="/documents/chartsLoader.min.js"></script>
+                <script type="text/javascript">
+                    {{ gc_draw(piechart, 'div_chart') }}
+                </script>
+
+            </div>
+        </div>
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,17 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Hello {% endblock %}
+
+{% block body %}
+<div class="example-wrapper">
+    <h1>Hello </h1>
+
+    {{ form_start(form) }}
+
+    <button type="submit" class="btn btn-success">envoyé</button>
+
+    {{ form_end(form) }}
+
+
+</div>
+{% endblock %}
