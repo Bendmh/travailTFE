@@ -25,6 +25,7 @@ class ResultatController extends AbstractController
         //$user_activity = $userActivityRepository->myFind(31);
 
         return $this->render('resultat/index.html.twig', [
+            'current_menu' => 'resultat',
             'user_activity' => $user_activity,
             'form_result' => $form->createView()
         ]);

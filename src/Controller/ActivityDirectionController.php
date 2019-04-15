@@ -68,7 +68,7 @@ class ActivityDirectionController extends AbstractController
     }
 
     /**
-     * @Route("/activity/{id}/regroupement", name="activity_regroupement")
+     * @Route("/activity/{id}/association", name="activity_association")
      * @param $id
      * @param ActivityRepository $activityRepository
      * @param ObjectManager $manager

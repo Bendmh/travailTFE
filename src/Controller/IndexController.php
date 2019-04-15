@@ -15,6 +15,7 @@ use App\Form\RegistrationType;
 use App\Form\ReponsesType;
 use App\Form\UserChangeDataType;
 use App\Repository\ActivityRepository;
+use App\Repository\ActivityTypeRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use League\Csv\Writer;
@@ -29,10 +30,12 @@ class IndexController extends AbstractController
     /**
      * @Route("/", name="index")
      */
-    public function index()
+    public function index(ActivityTypeRepository $activityTypeRepository)
     {
+        $activityTypes = $activityTypeRepository->findAll();
         return $this->render('index/index.html.twig', [
-            'current_menu' => 'home'
+            'current_menu' => 'home',
+            'activityTypes' => $activityTypes
         ]);
     }
 
