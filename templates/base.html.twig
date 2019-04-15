@@ -63,18 +63,28 @@
                     {% endif %}
 
                     {% if is_granted('ROLE_PROFESSEUR') %}
-                        <li class="nav-item {% if current_menu is defined and current_menu == 'csv' %} active {% endif %} dropdown">
+                        <li class="nav-item {% if current_menu is defined and current_menu == 'resultat' %} active {% endif %} dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Résultats
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ path('resultat') }}">Points</a>
-                                <a class="dropdown-item" href="{{ path('sondage_result', {'id' : 5}) }}">Sondages</a>
+                                <a class="dropdown-item" href="#">Sondages</a>
                             </div>
                         </li>
-                        {#<li class="nav-item {% if current_menu is defined and current_menu == 'resultat' %} active {% endif %}">
-                            <a class="nav-link" href="{{ path('resultat') }}">Résultats</a>
-                        </li>#}
+                    {% endif %}
+
+                    {% if is_granted('ROLE_SUPER_ADMIN') %}
+                        <li class="nav-item {% if current_menu is defined and current_menu == 'reglage' %} active {% endif %} dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                Réglages
+                            </a>
+                            <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                <a class="dropdown-item" href="{{ path('admin_list_type') }}">Type d'activité</a>
+                                {#<a class="dropdown-item" href="{{ path('sondage_result', {'id' : 5}) }}">MDP oublié</a>#}
+                                <a class="dropdown-item" href="#">Ajouter une classe</a>
+                            </div>
+                        </li>
                     {% endif %}
 
                     {% if app.user %}

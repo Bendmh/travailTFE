@@ -18,18 +18,18 @@
     <div class="container">
             <div class="d-block d-sm-none">
                 <ol>
-                    <li style="font-size: 20px">QCM</li>
-                    <img class="w-75" src="/images/QCM.JPG" alt="Image activité QCM">
-                    <li style="font-size: 20px">Association</li>
-                    <img class="w-75" src="/images/association.JPG" alt="Image activité association">
+                    {% for type in activityTypes %}
+                        <li style="font-size: 20px">{{ type.name }}</li>
+                        <img class="w-75" src="{{ vich_uploader_asset(type, 'imageFile') }}" alt="Image type activité">
+                    {% endfor %}
                 </ol>
             </div>
             <div class="d-none d-sm-block">
                 <ol>
-                    <li style="font-size: 20px">QCM</li>
-                    <img style="max-height: 300px; margin-bottom: 15px;" src="/images/QCM.JPG" alt="Image activité QCM">
-                    <li style="font-size: 20px">Association</li>
-                    <img style="max-height: 300px; margin-bottom: 15px;" src="/images/association.JPG" alt="Image activité association">
+                    {% for type in activityTypes %}
+                        <li style="font-size: 20px">{{ type.name }}</li>
+                        <img style="max-height: 300px; margin-bottom: 15px;" src="{{ vich_uploader_asset(type, 'imageFile') }}" alt="Image type activité">
+                    {% endfor %}
                 </ol>
             </div>
         </div>

@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form_type 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}Type d'activité{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>{% if id %}Editer{% else %}Nouveau{% endif %} type d'activité</h1>
+    </div>
+    <div class="container">
+        <div class="col-xs-12 col-lg-4 col-md-4">
+            {{ form_start(form_type) }}
+            {{ form_row(form_type.name) }}
+            {{ form_row(form_type.imageFile) }}
+            <button type="submit" class="btn btn-success">Créer</button>
+            {{ form_end(form_type) }}
+            <a href="{{ path('admin_list_type') }}"><button class="btn btn-primary">Retour</button></a>
+        </div>
+    </div>
+{% endblock %}
