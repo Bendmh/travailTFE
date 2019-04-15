@@ -163,8 +163,8 @@ class ActivityController extends AbstractController
      */
     public function delete($id, ActivityRepository $activityRepository, ObjectManager $manager){
 
-        $activities = $activityRepository->findOneby(['id' => $id]);
-        $manager->remove($activities);
+        $activity = $activityRepository->findOneby(['id' => $id]);
+        $manager->remove($activity);
         $manager->flush();
         return $this->redirectToRoute('activityPerso');
     }
