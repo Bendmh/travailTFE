@@ -39,7 +39,7 @@ $(document).ready(function(){
             }).then(function(response){
                 $collectionButton.hide();
                 let json = jQuery.parseJSON(response.data.message);
-                $('h3.result').html('Tu as obtenu ' + json.point + ' sur ' + json.total)
+                $('h3.result').html('Tu as obtenu ' + json.point + ' sur ' + json.total);
                 $('h4.enonce').hide();
             })
         }

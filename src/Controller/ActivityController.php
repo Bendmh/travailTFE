@@ -32,7 +32,7 @@ class ActivityController extends AbstractController
         $form->handleRequest($request);
         $activities = $activityRepository->findActivitySearch($search);
 
-        return $this->render('activity/index.html.twig', [
+        return $this->render('activity/activityList.html.twig', [
             'activites' => $activities,
             'current_menu' => 'activity',
             'perso' => false,
@@ -49,7 +49,7 @@ class ActivityController extends AbstractController
 
         $activities = $activityRepository->findBy(['created_by' => $this->getUser()]);
 
-        return $this->render('activity/index.html.twig', [
+        return $this->render('activity/activityList.html.twig', [
             'activites' => $activities,
             'current_menu' => 'activity',
             'perso' => true
