@@ -70,12 +70,17 @@ class ActivityController extends AbstractController
         if(!$activity){
             $activity = new Activity();
         }
+        $type = $activity->getType();
 
         $form = $this->createForm(ActivityType::class, $activity);
 
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
+
+            if($type){
+                $activity->setType($type);
+            }
 
             $activity->setCreatedBy($this->getUser());
 
