@@ -37,6 +37,9 @@ class ActivityRepository extends ServiceEntityRepository
                 ->setParameter('name', $search->getActivityName());
         }
 
+        $query = $query
+                ->andWhere('p.visible = true');
+
         return $query
             ->getquery()
             ->getResult();
