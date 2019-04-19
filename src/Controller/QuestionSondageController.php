@@ -68,8 +68,6 @@ class QuestionSondageController extends AbstractController
         //$reponseSondage = $reponseSondageRepository->findBy(['questionSondage' => $id]);
         $reponseSondage = $reponseSondageRepository->resultSondage($id);
         $total = $reponseSondageRepository->returnCount($id);
-        dump($reponseSondage);
-        dump($total);
 
 
         $tabData = [['sondage', 'Percentage']];

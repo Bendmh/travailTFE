@@ -13,7 +13,6 @@ class QuestionSondageSelectType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        dump($builder->getData());
         if(!is_null($builder->getData()->getChoix3()) && is_null($builder->getData()->getChoix4())){
             $builder
                 ->add('repTest', ChoiceType::class, [

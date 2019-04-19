@@ -127,7 +127,6 @@ class ActivityDirectionController extends AbstractController
 
         $reponseSondage = $reponseSondageRepository->findOneBy(['user' => $user->getId(), 'questionSondage' => $questionSondage->getId()]);
 
-        dump($reponseSondage);
         if(!is_null($reponseSondage)){
             $this->addFlash('error', 'Vous avez déjà répondu à ce sondage !');
             return $this->redirectToRoute('activity');
