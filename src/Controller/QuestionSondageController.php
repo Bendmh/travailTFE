@@ -6,6 +6,7 @@ use App\Entity\Activity;
 use App\Entity\QuestionSondage;
 use App\Form\QuestionSondageNewType;
 use App\Repository\ActivityRepository;
+use App\Repository\ActivityTypeRepository;
 use App\Repository\QuestionSondageRepository;
 use App\Repository\ReponseSondageRepository;
 use CMEN\GoogleChartsBundle\GoogleCharts\Charts\PieChart;
@@ -54,6 +55,7 @@ class QuestionSondageController extends AbstractController
             'form_quest' => $form->createView(),
             'activity' => $activity,
             'question' => $questionSondage,
+            'current_menu' => 'activity'
         ]);
 
     }
@@ -62,12 +64,13 @@ class QuestionSondageController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\Response
      * @Route("/sondage/{id}/result", name="sondage_result")
      */
-    public function resultSondage($id, ReponseSondageRepository $reponseSondageRepository, QuestionSondageRepository $questionSondageRepository){
+    public function resultSondage($id, ReponseSondageRepository $reponseSondageRepository, QuestionSondageRepository $questionSondageRepository, ActivityRepository $activityRepository){
 
-        $questionSondage = $questionSondageRepository->findOneBy(['id' => $id]);
+        $questionSondage = $activityRepository->findOneBy(['id' => $id]);
+        $questionSondageId = $questionSondage->getQuestionSondage()->getId();
         //$reponseSondage = $reponseSondageRepository->findBy(['questionSondage' => $id]);
-        $reponseSondage = $reponseSondageRepository->resultSondage($id);
-        $total = $reponseSondageRepository->returnCount($id);
+        $reponseSondage = $reponseSondageRepository->resultSondage($questionSondageId);
+        $total = $reponseSondageRepository->returnCount($questionSondageId);
 
 
         $tabData = [['sondage', 'Percentage']];
@@ -79,18 +82,32 @@ class QuestionSondageController extends AbstractController
         $pieChart->getData()->setArrayToDataTable($tabData);
         $pieChart->getOptions()->setIs3D(true);
         $pieChart->getOptions()->setHeight(500);
-        $pieChart->getOptions()->setWidth(900);/*
-        $pieChart->getOptions()->getTitleTextStyle()->setBold(true);*//*
-        $pieChart->getOptions()->getTitleTextStyle()->setColor('#009900');*//*
-        $pieChart->getOptions()->getTitleTextStyle()->setItalic(true);*//*
-        $pieChart->getOptions()->getTitleTextStyle()->setFontName('Arial');
-        $pieChart->getOptions()->getTitleTextStyle()->setFontSize(20);*/
+        $pieChart->getOptions()->setWidth(900);
 
         return $this->render('question_sondage/result.html.twig', [
-            'questionSondage' => $questionSondage,
+            'questionSondage' => $questionSondage->getQuestionSondage(),
             'results' => $reponseSondage,
             'piechart' => $pieChart,
-            'total' => $total[0][1]
+            'total' => $total[0][1],
+            'current_menu' => 'resultat'
+        ]);
+    }
+
+    /**
+     * @Route("/sondage/list", name="list_sondage")
+     */
+    public function listSondage(ActivityRepository $activityRepository){
+        $userId = $this->getUser()->getId();
+        dump($userId);
+        $activitySondageTeacher = $activityRepository->activitySondageByTeacher($userId);
+        //$typeSondage = $activityTypeRepository->findOneBy(['name' => 'sondage']);
+        dump($activitySondageTeacher);
+        /*if(!$typeSondage){
+            $this->addFlash('error', 'Aucun sondage n\'est créé par vous.');
+        }*/
+        return $this->render('question_sondage/list.html.twig', [
+            'activitySondage' => $activitySondageTeacher,
+            'current_menu' => 'resultat'
         ]);
     }
 }
