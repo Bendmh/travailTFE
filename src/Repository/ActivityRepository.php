@@ -57,6 +57,19 @@ class ActivityRepository extends ServiceEntityRepository
                 ->getResult();
     }
 
+    public function activitySondageByTeacher($id){
+        return $this
+                ->createQueryBuilder('p')
+                ->join('p.type', 't')
+                ->andWhere('p.created_by = :creator')
+                ->setParameter('creator', $id)
+                ->andWhere('t.name = :sondage')
+                ->setParameter('sondage', 'sondage')
+                ->getQuery()
+                ->getResult();
+
+    }
+
     // /**
     //  * @return Activity[] Returns an array of Activity objects
     //  */
