@@ -13,7 +13,7 @@
             {{ form_start(form_type) }}
             {{ form_row(form_type.name) }}
             {{ form_row(form_type.imageFile) }}
-            <button type="submit" class="btn btn-success">Créer</button>
+            <button type="submit" class="btn btn-success">{% if id %}Editer{% else %}Créer{% endif %}</button>
             {{ form_end(form_type) }}
             <a href="{{ path('admin_list_type') }}"><button class="btn btn-primary">Retour</button></a>
         </div>
