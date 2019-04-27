@@ -63,6 +63,7 @@ class ActivityDirectionController extends AbstractController
 
         return $this->render('activity/activity.html.twig', [
             'activity' => $activity,
+            'current_menu' => 'activity',
             'tab' => $tab
         ]);
     }
@@ -103,6 +104,7 @@ class ActivityDirectionController extends AbstractController
 
         return $this->render('questions_groupes/activity.html.twig', [
             'activity' => $activity,
+            'current_menu' => 'activity',
             'answers' => $answers
         ]);
     }
@@ -150,6 +152,7 @@ class ActivityDirectionController extends AbstractController
 
         return $this->render('question_sondage/sondage.html.twig', [
             'form_quest' => $form->createView(),
+            'current_menu' => 'activity',
             'activity' => $activity
         ]);
     }
