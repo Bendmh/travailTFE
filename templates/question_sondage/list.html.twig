@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste sondages{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Hello</h1>
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-9 col-md-9">
+                <div class="list-group">
+                    {% for activity in activitySondage %}
+                        <a href="{{ path('sondage_result', {'id' : activity.id}) }}" class="list-group-item list-group-item-action">{{ activity.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

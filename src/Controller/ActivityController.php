@@ -102,6 +102,7 @@ class ActivityController extends AbstractController
 
         return $this->render('activity/new.html.twig', [
                 'form_act' => $form->createView(),
+                'current_menu' => 'activity',
                 'activity' => $activity
         ]);
     }
