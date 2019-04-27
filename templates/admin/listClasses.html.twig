@@ -1,0 +1,23 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Type d'activité{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Type d'activités possibles</h1>
+    </div>
+    <div class="container">
+        <div class="col-xs-12 col-lg-6 col-md-6">
+            <ul class="list-group">
+                {% for type in classes_types %}
+                    <li class="list-group-item">
+                        {{ type.nom }}
+                        <a href="{{ path('edit_classe', {'id' : type.id}) }}"><button class="btn btn-primary">Editer</button></a>
+                        <a href="{{ path('delete_classe', {'id' : type.id}) }}"><button  class="btn btn-danger">Supprimer</button></a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <a href="{{ path('new_classe') }}"><button class="btn btn-primary mt-4">Ajouter une classe</button></a>
+        </div>
+    </div>
+{% endblock %}
