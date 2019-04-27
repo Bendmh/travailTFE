@@ -98,10 +98,8 @@ class QuestionSondageController extends AbstractController
      */
     public function listSondage(ActivityRepository $activityRepository){
         $userId = $this->getUser()->getId();
-        dump($userId);
         $activitySondageTeacher = $activityRepository->activitySondageByTeacher($userId);
         //$typeSondage = $activityTypeRepository->findOneBy(['name' => 'sondage']);
-        dump($activitySondageTeacher);
         /*if(!$typeSondage){
             $this->addFlash('error', 'Aucun sondage n\'est créé par vous.');
         }*/
