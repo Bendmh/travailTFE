@@ -59,4 +59,23 @@ class SecurityController extends AbstractController
      * @Route("/deconnexion", name="security_logout")
      */
     public function logout(){}
+
+    /**
+     * @param Request $request
+     * @Route("/mdpOublie", name="mdpOublie")
+     */
+    public function mdpOublie(Request $request, UserRepository $repository, ObjectManager $manager){
+        $userName = $request->request->get('_username');
+        $user = $repository->findOneBy(['pseudo' => $userName]);
+        if($user){
+            $user->setMdpOublie(true);
+            $this->addFlash('success', 'Demande de changement de MDP envoyé');
+            $manager->persist($user);
+            $manager->flush();
+        }
+        else {
+            $this->addFlash('error', 'Ce pseudo n\'est pas dans la base de données');
+        }
+        $this->redirectToRoute('security_login');
+    }
 }

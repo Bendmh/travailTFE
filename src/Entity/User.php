@@ -95,6 +95,11 @@ class User implements UserInterface
      */
     private $reponseSondages;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $mdpOublie;
+
 
     public function __construct()
     {
@@ -338,6 +343,18 @@ class User implements UserInterface
                 $reponseSondage->setUser(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getMdpOublie(): ?bool
+    {
+        return $this->mdpOublie;
+    }
+
+    public function setMdpOublie(?bool $mdpOublie): self
+    {
+        $this->mdpOublie = $mdpOublie;
 
         return $this;
     }
