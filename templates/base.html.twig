@@ -57,7 +57,7 @@
                     </li>
                     {% endif %}
                     {% if is_granted('ROLE_ELEVE') %}
-                        <li class="nav-item {% if current_menu is defined and current_menu == 'resultat' %} active {% endif %}">
+                        <li class="nav-item {% if current_menu is defined and current_menu == 'mesResultat' %} active {% endif %}">
                             <a class="nav-link" href="{{ path('resultatPerso', {'id' : app.user.id }) }}">Mes résultats</a>
                         </li>
                     {% endif %}
