@@ -4,9 +4,8 @@
 
 {% block body %}
 
-
     <div class="jumbotron">
-        <h1>{{ activity.name }}</h1>
+        <h1 name="{{ activity.id }}" class="activityId">{{ activity.name }}</h1>
         {% for message in app.flashes('success') %}
             <div class="alert alert-success">
                 {{ message }}
@@ -34,7 +33,7 @@
                                     {% if (question.bonneReponse1) %}
                                         <div class="form-check p-2">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="bonneReponse"  value="{{ question.bonneReponse1 }}">{{ question.bonneReponse1 }}<br>
+                                                <input type="checkbox" name="{{ question.id }}" class="bonneReponse"  value="{{ question.bonneReponse1 }}">{{ question.bonneReponse1 }}<br>
                                             </label>
                                         </div>
                                     {% endif %}
@@ -42,7 +41,7 @@
                                     {% if (question.bonneReponse2) %}
                                         <div class="form-check p-2">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="bonneReponse"  value="{{ question.bonneReponse2 }}">{{ question.bonneReponse2 }}
+                                                <input type="checkbox" name="{{ question.id }}" class="bonneReponse"  value="{{ question.bonneReponse2 }}">{{ question.bonneReponse2 }}
                                             </label>
                                         </div>
                                     {% endif %}
@@ -50,7 +49,7 @@
                                     {% if (question.bonneReponse3) %}
                                         <div class="form-check p-2">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="bonneReponse" value="{{ question.bonneReponse3 }}">{{ question.bonneReponse3 }}<br>
+                                                <input type="checkbox" name="{{ question.id }}" class="bonneReponse" value="{{ question.bonneReponse3 }}">{{ question.bonneReponse3 }}<br>
                                             </label>
                                         </div>
                                     {% endif %}
@@ -58,7 +57,7 @@
                                     {% if (question.mauvaiseReponse1) %}
                                         <div class="form-check p-2">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="mauvaiseReponse" value="{{ question.mauvaiseReponse1 }}">{{ question.mauvaiseReponse1 }}<br>
+                                                <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse1 }}">{{ question.mauvaiseReponse1 }}<br>
                                             </label>
                                         </div>
                                     {% endif %}
@@ -66,7 +65,7 @@
                                     {% if (question.mauvaiseReponse2) %}
                                         <div class="form-check p-2">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="mauvaiseReponse" value="{{ question.mauvaiseReponse2 }}">{{ question.mauvaiseReponse2 }}<br>
+                                                <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse2 }}">{{ question.mauvaiseReponse2 }}<br>
                                             </label>
                                         </div>
                                     {% endif %}
@@ -74,7 +73,7 @@
                                     {% if (question.mauvaiseReponse3) %}
                                         <div class="form-check p-2">
                                             <label class="form-check-label">
-                                                <input type="checkbox" class="mauvaiseReponse" value="{{ question.mauvaiseReponse3 }}">{{ question.mauvaiseReponse3 }}<br>
+                                                <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse3 }}">{{ question.mauvaiseReponse3 }}<br>
                                             </label>
                                         </div>
                                     {% endif %}
