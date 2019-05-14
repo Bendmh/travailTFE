@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -82,6 +84,16 @@ class Questions
      * @ORM\ManyToOne(targetEntity="App\Entity\Activity", inversedBy="question")
      */
     private $activity;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="questionId")
+     */
+    private $reponseEleveQCMs;
+
+    public function __construct()
+    {
+        $this->reponseEleveQCMs = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -263,6 +275,37 @@ class Questions
     public function setActivity(?Activity $activity): self
     {
         $this->activity = $activity;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReponseEleveQCM[]
+     */
+    public function getReponseEleveQCMs(): Collection
+    {
+        return $this->reponseEleveQCMs;
+    }
+
+    public function addReponseEleveQCM(ReponseEleveQCM $reponseEleveQCM): self
+    {
+        if (!$this->reponseEleveQCMs->contains($reponseEleveQCM)) {
+            $this->reponseEleveQCMs[] = $reponseEleveQCM;
+            $reponseEleveQCM->setQuestionId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseEleveQCM(ReponseEleveQCM $reponseEleveQCM): self
+    {
+        if ($this->reponseEleveQCMs->contains($reponseEleveQCM)) {
+            $this->reponseEleveQCMs->removeElement($reponseEleveQCM);
+            // set the owning side to null (unless already changed)
+            if ($reponseEleveQCM->getQuestionId() === $this) {
+                $reponseEleveQCM->setQuestionId(null);
+            }
+        }
 
         return $this;
     }

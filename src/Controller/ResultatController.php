@@ -4,9 +4,11 @@ namespace App\Controller;
 
 use App\Entity\ResultSearch;
 use App\Form\ResultSearchType;
+use App\Repository\ReponseEleveQCMRepository;
 use App\Repository\UserActivityRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class ResultatController extends AbstractController
@@ -45,8 +47,30 @@ class ResultatController extends AbstractController
         $user_activity = $userActivityRepository->findBy(['user_id' => $id]);
 
         return $this->render('resultat/index.html.twig', [
+            'current_menu' => 'mesResultat',
             'user_activity' => $user_activity,
             'form_result' => $form->createView()
         ]);
+    }
+
+    /**
+     * @Route("/resultat/{activityId}/{userId}", name="result_student_activity")
+     */
+    public function reponseEleve($userId, $activityId, ReponseEleveQCMRepository $reponseEleveQCMRepository){
+        $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
+
+        $user = $responseEleveQCMList[0]->getUserId();
+        $activity = $responseEleveQCMList[0]->getActivityId();
+
+        $template = $this->renderView('resultat/resultPerso.html.twig', [
+            'responseEleveList' => $responseEleveQCMList,
+            'activity' => $activity,
+            'user' => $user
+        ]);
+        $json = json_encode($template);
+        $response = new Response($json, 200);
+        //$response->headers->set('Content-Type', 'application/json');
+        return $response;
+
     }
 }

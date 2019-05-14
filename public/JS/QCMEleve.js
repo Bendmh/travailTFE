@@ -19,9 +19,18 @@ $(document).ready(function(){
 
         $point = $('input.bonneReponse:checked').length - $('input.mauvaiseReponse:checked').length;
 
+        $retour = {};
+        $tab = [];
+
+        $repsonse = $('input:checked').each(function () {
+            $retour = {'activityId' : $('.activityId').attr('name'), 'questionId' : $(this).attr('name'), 'value' : $(this).val()};
+            $tab.push($retour);
+        });
+
         $final = $('.final').attr('href');
 
         axios.post($final, {
+            response: $tab,
             total: $total,
             point: $point
         }).then(function (response) {

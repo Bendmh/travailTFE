@@ -89,11 +89,17 @@ class Activity
      */
     private $questionSondage;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="activityId", cascade={"remove"})
+     */
+    private $reponseEleveQCMs;
+
     public function __construct()
     {
         $this->userActivities = new ArrayCollection();
         $this->question = new ArrayCollection();
         $this->questionsGroupes = new ArrayCollection();
+        $this->reponseEleveQCMs = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -305,6 +311,37 @@ class Activity
         // set the owning side of the relation if necessary
         if ($this !== $questionSondage->getActivity()) {
             $questionSondage->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReponseEleveQCM[]
+     */
+    public function getReponseEleveQCMs(): Collection
+    {
+        return $this->reponseEleveQCMs;
+    }
+
+    public function addReponseEleveQCM(ReponseEleveQCM $reponseEleveQCM): self
+    {
+        if (!$this->reponseEleveQCMs->contains($reponseEleveQCM)) {
+            $this->reponseEleveQCMs[] = $reponseEleveQCM;
+            $reponseEleveQCM->setActivityId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseEleveQCM(ReponseEleveQCM $reponseEleveQCM): self
+    {
+        if ($this->reponseEleveQCMs->contains($reponseEleveQCM)) {
+            $this->reponseEleveQCMs->removeElement($reponseEleveQCM);
+            // set the owning side to null (unless already changed)
+            if ($reponseEleveQCM->getActivityId() === $this) {
+                $reponseEleveQCM->setActivityId(null);
+            }
         }
 
         return $this;
