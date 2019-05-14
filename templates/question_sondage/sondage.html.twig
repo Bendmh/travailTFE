@@ -15,6 +15,7 @@
             <div class="col-9 col-lg-9 col-md-9">
                 <h2>{{ activity.questionSondage.question }}</h2>
                 {{ form_start(form_quest) }}
+                {{ form_row(form_quest.children['repTest']) }}
                 <button class="btn btn-success">Envoyer</button>
                 {{ form_end(form_quest) }}
             </div>

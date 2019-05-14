@@ -55,7 +55,7 @@ class UserActivityRepository extends ServiceEntityRepository
 
             if($search->getClasse()){
                 $query = $query
-                    ->andWhere('q.nom = :classe')
+                    ->andWhere('q.id = :classe')
                     ->setParameter('classe', $search->getClasse());
             }
 

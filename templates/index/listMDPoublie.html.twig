@@ -1,0 +1,47 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste MDP oublié{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Liste des personnes ayant oublié leur MDP</h1>
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="container">
+        <form action="{{ path('change_MDP') }}" method="post">
+            <div class="row">
+                <div class="col-12 col-lg-9 col-md-9">
+                    <table class="table">
+                        <thead class="thead-dark">
+                        <tr>
+                            <th scope="col">Nom</th>
+                            <th scope="col">Prénom</th>
+                            <th scope="col">Pseudo</th>
+                            <th scope="col">changer</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                            {% for user in userList %}
+                                <tr>
+                                    <td>{{ user.nom }}</td>
+                                    <td>{{ user.prenom }}</td>
+                                    <td>{{ user.pseudo }}</td>
+                                    <td><label class="mr-3" for="{{ user.pseudo }}">à changer</label><input id="{{ user.pseudo }}" name="{{ user.pseudo }}" type="checkbox"></td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="col-12 col-lg-3 col-md-3">
+                    <h5>Nouveau mot de passe</h5>
+                    <input type="text" placeholder="MDP ..." name="_password" class=" mb-3 form-control">
+                    <button type="submit" class="btn btn-success">Envoyer</button>
+                </div>
+            </div>
+        </form>
+    </div>
+{% endblock %}

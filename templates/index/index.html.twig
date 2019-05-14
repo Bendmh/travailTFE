@@ -9,6 +9,11 @@
         {% else %}
             <h1>Des activités cool en ligne</h1>
         {% endif %}
+        {% if MDPChange %}
+            <div class="alert alert-success">
+                Votre mot de passe a été changé. N'oubliez pas d'aller le changer dans votre page perso
+            </div>
+        {% endif %}
         {% for message in app.flashes('success') %}
             <div class="alert alert-success">
                 {{ message }}

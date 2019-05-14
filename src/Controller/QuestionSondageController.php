@@ -81,8 +81,8 @@ class QuestionSondageController extends AbstractController
         $pieChart = new PieChart();
         $pieChart->getData()->setArrayToDataTable($tabData);
         $pieChart->getOptions()->setIs3D(true);
-        $pieChart->getOptions()->setHeight(500);
-        $pieChart->getOptions()->setWidth(900);
+        $pieChart->getOptions()->setHeight(400);
+        $pieChart->getOptions()->setWidth(500);
 
         return $this->render('question_sondage/result.html.twig', [
             'questionSondage' => $questionSondage->getQuestionSondage(),
@@ -98,10 +98,8 @@ class QuestionSondageController extends AbstractController
      */
     public function listSondage(ActivityRepository $activityRepository){
         $userId = $this->getUser()->getId();
-        dump($userId);
         $activitySondageTeacher = $activityRepository->activitySondageByTeacher($userId);
         //$typeSondage = $activityTypeRepository->findOneBy(['name' => 'sondage']);
-        dump($activitySondageTeacher);
         /*if(!$typeSondage){
             $this->addFlash('error', 'Aucun sondage n\'est créé par vous.');
         }*/

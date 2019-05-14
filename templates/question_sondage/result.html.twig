@@ -4,17 +4,17 @@
 
 {% block body %}
     <div class="jumbotron">
-        <h1>Résultat {{ questionSondage.question }}</h1>
+        <h1>{{ questionSondage.question }}</h1>
     </div>
     <div class="container">
         <div class="row">
-            <div class="col-4 col-lg-4 col-md-4 text-right">
+            <div class="col-12 col-lg-5 col-md-5">
                 {% for result in results %}
-                    <p>{{ result['response'] }} : {{ result[1] }}</p>
+                    <p>{{ result[1] }} personne(s) a/ont choisi {{ result['response'] }}</p>
                 {% endfor %}
-                <p>Total : {{ total }}</p>
+                <p>{{ total }} personne(s) a/ont participé à ce sondage</p>
             </div>
-            <div class="col-8 col-lg-8 col-md-8">
+            <div class="col-12 col-lg-7 col-md-7">
                 <div id="div_chart"></div>
 
                 <script type="text/javascript" src="/documents/chartsLoader.min.js"></script>

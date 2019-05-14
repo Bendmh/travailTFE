@@ -4,6 +4,7 @@ security:
             algorithm: bcrypt
 
     role_hierarchy:
+        ROLE_PROFESSEUR: [ROLE_ELEVE]
         ROLE_SUPER_ADMIN: [ROLE_PROFESSEUR]
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers

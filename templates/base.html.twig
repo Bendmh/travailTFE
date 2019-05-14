@@ -57,7 +57,7 @@
                     </li>
                     {% endif %}
                     {% if is_granted('ROLE_ELEVE') %}
-                        <li class="nav-item {% if current_menu is defined and current_menu == 'resultat' %} active {% endif %}">
+                        <li class="nav-item {% if current_menu is defined and current_menu == 'mesResultat' %} active {% endif %}">
                             <a class="nav-link" href="{{ path('resultatPerso', {'id' : app.user.id }) }}">Mes résultats</a>
                         </li>
                     {% endif %}
@@ -72,17 +72,15 @@
                                 <a class="dropdown-item" href="{{ path('list_sondage') }}">Sondages</a>
                             </div>
                         </li>
-                    {% endif %}
-
-                    {% if is_granted('ROLE_SUPER_ADMIN') %}
                         <li class="nav-item {% if current_menu is defined and current_menu == 'reglage' %} active {% endif %} dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                 Réglages
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ path('admin_list_type') }}">Type d'activité</a>
-                                {#<a class="dropdown-item" href="{{ path('sondage_result', {'id' : 5}) }}">MDP oublié</a>#}
-                                <a class="dropdown-item" href="{{ path('admin_list_classes') }}">Ajouter une classe</a>
+                                <a class="dropdown-item" href="{{ path('MDP_oublie') }}">MDP oublié</a>
+                                {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                    <a class="dropdown-item" href="{{ path('admin_list_classes') }}">Ajouter une classe</a>
+                                {% endif %}
                             </div>
                         </li>
                     {% endif %}
@@ -114,16 +112,11 @@
             </footer>
         {% endblock %}
 
-        {#<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>#}
-        {#<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>#}
-        {#<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>#}
         <script src="/documents/jquery-3.3.1.slim.min.js"></script>
         <script src="/documents/popper.min.js"></script>
         <script src="/documents/bootstrap.min.js"></script>
         <script src="/documents/select2.min.js"></script>
         <script src="/JS/index.js"></script>
-        {#<script src="{{ asset('build/runtime.js') }}"></script>
-        <script src="{{ asset('build/app.js') }}"></script>#}
         {% block javascripts %}{% endblock %}
     </body>
 </html>

@@ -21,8 +21,8 @@ $(document).ready(function(){
     $point = 0;
 
     $collectionButton.on('click', function (e) {
-        buttonClass = $(this).attr('class').split(" ").pop();
-        responseClass = $collectionResponse.first().attr('class').split(" ").pop();
+        buttonClass = $(this).attr('name');
+        responseClass = $collectionResponse.attr('name');
 
         if(buttonClass === responseClass){
             $point++;
