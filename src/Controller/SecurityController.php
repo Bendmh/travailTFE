@@ -76,6 +76,6 @@ class SecurityController extends AbstractController
         else {
             $this->addFlash('error', 'Ce pseudo n\'est pas dans la base de données');
         }
-        $this->redirectToRoute('security_login');
+        return $this->redirectToRoute('security_login');
     }
 }
