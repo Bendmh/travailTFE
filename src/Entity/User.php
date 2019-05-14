@@ -100,6 +100,11 @@ class User implements UserInterface
      */
     private $mdpOublie;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="userId")
+     */
+    private $reponseEleveQCMs;
+
 
     public function __construct()
     {
@@ -108,6 +113,7 @@ class User implements UserInterface
         $this->activity_id = new ArrayCollection();
         $this->activity_creator = new ArrayCollection();
         $this->reponseSondages = new ArrayCollection();
+        $this->reponseEleveQCMs = new ArrayCollection();
     }
 
     /**
@@ -355,6 +361,37 @@ class User implements UserInterface
     public function setMdpOublie(?bool $mdpOublie): self
     {
         $this->mdpOublie = $mdpOublie;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReponseEleveQCM[]
+     */
+    public function getReponseEleveQCMs(): Collection
+    {
+        return $this->reponseEleveQCMs;
+    }
+
+    public function addReponseEleveQCM(ReponseEleveQCM $reponseEleveQCM): self
+    {
+        if (!$this->reponseEleveQCMs->contains($reponseEleveQCM)) {
+            $this->reponseEleveQCMs[] = $reponseEleveQCM;
+            $reponseEleveQCM->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseEleveQCM(ReponseEleveQCM $reponseEleveQCM): self
+    {
+        if ($this->reponseEleveQCMs->contains($reponseEleveQCM)) {
+            $this->reponseEleveQCMs->removeElement($reponseEleveQCM);
+            // set the owning side to null (unless already changed)
+            if ($reponseEleveQCM->getUserId() === $this) {
+                $reponseEleveQCM->setUserId(null);
+            }
+        }
 
         return $this;
     }
