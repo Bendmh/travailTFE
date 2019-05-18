@@ -4,7 +4,7 @@
 
 {% block body %}
     <div class="jumbotron">
-        <h1>{{ questionSondage.question }}</h1>
+        <h1 name="{{ id }}">{{ questionSondage.question }}</h1>
     </div>
     <div class="container">
         <div class="row">
@@ -15,16 +15,26 @@
                 <p>{{ total }} personne(s) a/ont participé à ce sondage</p>
             </div>
             <div class="col-12 col-lg-7 col-md-7">
-                <div id="div_chart"></div>
+
+                <canvas id="myChart" width="300" height="300"></canvas>
+               {# <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>#}
+
+                {#<div id="div_chart"></div>
 
                 <script type="text/javascript" src="/documents/chartsLoader.min.js"></script>
                 <script type="text/javascript">
                     {{ gc_draw(piechart, 'div_chart') }}
-                </script>
+                </script>#}
 
             </div>
         </div>
     </div>
 
 
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/documents/chart.min.js"></script>
+    <script src="/documents/axios.min.js"></script>
+    <script src="/JS/resultSondage.js"></script>
 {% endblock %}
