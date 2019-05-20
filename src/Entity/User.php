@@ -81,7 +81,7 @@ class User implements UserInterface
     private $classes;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserActivity", mappedBy="user_id")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserActivity", mappedBy="user_id", cascade={"persist", "remove"})
      */
     private $activity_id;
 
@@ -91,7 +91,7 @@ class User implements UserInterface
     private $activity_creator;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ReponseSondage", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseSondage", mappedBy="user", cascade={"persist", "remove"})
      */
     private $reponseSondages;
 
@@ -101,7 +101,7 @@ class User implements UserInterface
     private $mdpOublie;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="userId")
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="userId", cascade={"persist", "remove"})
      */
     private $reponseEleveQCMs;
 
