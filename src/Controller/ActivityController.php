@@ -92,13 +92,11 @@ class ActivityController extends AbstractController
                 return $this->redirectToRoute('activity_'. $activity->getType()->getName() .'_new', ['id' => $activity->getId()]);
             }else {
                 $this->addFlash('success', 'Activité modifiée avec succès');
-                return $this->redirectToRoute('activity_' . $activity->getType()->getName(), ['id' => $activity->getId()]);
+                return $this->redirectToRoute('activityPerso');
             }
 
 
         }
-
-
 
         return $this->render('activity/new.html.twig', [
                 'form_act' => $form->createView(),
