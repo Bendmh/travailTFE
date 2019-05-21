@@ -20,12 +20,18 @@ $(document).ready(function(){
 
     $point = 0;
 
+    $retour = {};
+    $tab = [];
     $collectionButton.on('click', function (e) {
         buttonClass = $(this).attr('name');
         responseClass = $collectionResponse.attr('name');
 
         if(buttonClass === responseClass){
             $point++;
+        }
+        else {
+            $retour = {'reponse' : $collectionResponse.html(), 'groupe' : buttonClass};
+            $tab.push($retour);
         }
         $collectionResponse.first().remove();
         $collectionResponse = $('h3.response');
@@ -34,6 +40,7 @@ $(document).ready(function(){
 
             //let url = this.href;
             axios.post($final, {
+                response : $tab,
                 total : $total,
                 point : $point
             }).then(function(response){

@@ -2,13 +2,16 @@
 
 namespace App\Controller;
 
+use App\Entity\ActivityType;
 use App\Entity\QuestionsGroupes;
+use App\Entity\ReponseEleveAssociation;
 use App\Entity\ReponseEleveQCM;
 use App\Form\QuestionsGroupesType;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityTypeRepository;
 use App\Repository\QuestionsGroupesRepository;
 use App\Repository\QuestionsRepository;
+use App\Repository\ReponseEleveAssociationRepository;
 use App\Repository\ReponseEleveQCMRepository;
 use App\Repository\UserActivityRepository;
 use Doctrine\Common\Persistence\ObjectManager;
@@ -66,28 +69,33 @@ class QuestionsGroupesController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @Route("{id}/verification", name="correction_groups")
      */
-    public function correctionGroups($id, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityTypeRepository $activityTypeRepository){
+    public function correctionGroups($id, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityTypeRepository $activityTypeRepository, ReponseEleveAssociationRepository $eleveAssociationRepository){
 
         $data = utf8_encode($request->getContent());
 
         $json = json_decode($data);
 
         $user = $this->getUser();
-        $typeQCM = $activityTypeRepository->findOneBy(['name' => 'QCM']);
+        $typeQCM = $activityTypeRepository->findOneBy(['name' => ActivityType::QCM_ACTIVITY]);
+        $typeAssociation = $activityTypeRepository->findOneBy(['name' => ActivityType::ASSOCIATION_ACTIVITY]);
+
         $activity = $activityRepository->findOneBy(['id' => $id]);
 
         $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $id]);
         $user_activity->setPoint($json->point);
         $user_activity->setTotal($json->total);
 
+        $responseList = $json->response;
+
         //Si l'activité est du type QCM on enregistre les résultats (pour le moment)
         if($activity->getType()->getId() == $typeQCM->getId()){
+
+            //je supprime les réponses déjà existantes
             $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
             foreach ($responseEleveQCMList as $response){
                 $manager->remove($response);
             }
 
-            $responseList = $json->response;
             foreach ($responseList as $response){
                 $reponseEleveQCM = new ReponseEleveQCM();
                 $activityId = $activityRepository->findOneBy(['id' => $response->activityId]);
@@ -97,6 +105,26 @@ class QuestionsGroupesController extends AbstractController
                 $reponseEleveQCM->setQuestionId($questionId);
                 $reponseEleveQCM->setReponse($response->value);
                 $manager->persist($reponseEleveQCM);
+            }
+        }
+        //Si elle est de type association
+        elseif ($activity->getType()->getId() == $typeAssociation->getId()){
+
+            //je supprime les réponses déjà existantes
+            $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+            foreach ($responseEleveAssociationList as $response){
+                $manager->remove($response);
+            }
+            $manager->flush();
+
+            foreach($responseList as $response){
+                $reponseEleveAssociation = new ReponseEleveAssociation();
+                $activityId = $activityRepository->findOneBy(['id' => $id]);
+                $reponseEleveAssociation->setActivityId($activityId);
+                $reponseEleveAssociation->setUserId($user);
+                $reponseEleveAssociation->setGroupe($response->groupe);
+                $reponseEleveAssociation->setReponse($response->reponse);
+                $manager->persist($reponseEleveAssociation);
             }
         }
 

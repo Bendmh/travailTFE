@@ -94,12 +94,18 @@ class Activity
      */
     private $reponseEleveQCMs;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveAssociation", mappedBy="activityId")
+     */
+    private $reponseEleveAssociations;
+
     public function __construct()
     {
         $this->userActivities = new ArrayCollection();
         $this->question = new ArrayCollection();
         $this->questionsGroupes = new ArrayCollection();
         $this->reponseEleveQCMs = new ArrayCollection();
+        $this->reponseEleveAssociations = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -341,6 +347,37 @@ class Activity
             // set the owning side to null (unless already changed)
             if ($reponseEleveQCM->getActivityId() === $this) {
                 $reponseEleveQCM->setActivityId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReponseEleveAssociation[]
+     */
+    public function getReponseEleveAssociations(): Collection
+    {
+        return $this->reponseEleveAssociations;
+    }
+
+    public function addReponseEleveAssociation(ReponseEleveAssociation $reponseEleveAssociation): self
+    {
+        if (!$this->reponseEleveAssociations->contains($reponseEleveAssociation)) {
+            $this->reponseEleveAssociations[] = $reponseEleveAssociation;
+            $reponseEleveAssociation->setActivityId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseEleveAssociation(ReponseEleveAssociation $reponseEleveAssociation): self
+    {
+        if ($this->reponseEleveAssociations->contains($reponseEleveAssociation)) {
+            $this->reponseEleveAssociations->removeElement($reponseEleveAssociation);
+            // set the owning side to null (unless already changed)
+            if ($reponseEleveAssociation->getActivityId() === $this) {
+                $reponseEleveAssociation->setActivityId(null);
             }
         }
 

@@ -2,9 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\ActivityType;
 use App\Entity\ResultSearch;
 use App\Entity\User;
 use App\Form\ResultSearchType;
+use App\Repository\ActivityRepository;
+use App\Repository\ReponseEleveAssociationRepository;
 use App\Repository\ReponseEleveQCMRepository;
 use App\Repository\UserActivityRepository;
 use App\Repository\UserRepository;
@@ -64,17 +67,31 @@ class ResultatController extends AbstractController
     /**
      * @Route("/resultat/{activityId}/{userId}", name="result_student_activity")
      */
-    public function reponseEleve($userId, $activityId, ReponseEleveQCMRepository $reponseEleveQCMRepository){
-        $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
+    public function reponseEleveQCM($userId, $activityId, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityRepository $activityRepository, ReponseEleveAssociationRepository $eleveAssociationRepository){
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
 
-        $user = $responseEleveQCMList[0]->getUserId();
-        $activity = $responseEleveQCMList[0]->getActivityId();
+        if($activity->getType()->getName() == ActivityType::QCM_ACTIVITY){
+            $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
 
-        $template = $this->renderView('resultat/resultPerso.html.twig', [
-            'responseEleveList' => $responseEleveQCMList,
-            'activity' => $activity,
-            'user' => $user
-        ]);
+            $user = $responseEleveQCMList[0]->getUserId();
+            //$activity = $responseEleveQCMList[0]->getActivityId();
+
+            $template = $this->renderView('resultat/resultPersoQCM.html.twig', [
+                'responseEleveList' => $responseEleveQCMList,
+                'activity' => $activity,
+                'user' => $user
+            ]);
+        }
+        elseif ($activity->getType()->getName() == ActivityType::ASSOCIATION_ACTIVITY){
+            $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
+
+            $user = $responseEleveAssociationList[0]->getUserId();
+
+            $template = $this->renderView('resultat/resultPersoAssociation.html.twig', [
+                'responseEleveList' => $responseEleveAssociationList,
+            ]);
+        }
+        $response = new Response('test', 200);
         $json = json_encode($template);
         $response = new Response($json, 200);
         //$response->headers->set('Content-Type', 'application/json');
