@@ -6,6 +6,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\File\File;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * @ORM\Entity(repositoryClass="App\Repository\CSVRepository")
@@ -29,6 +30,10 @@ class CSV
     /**
      * @Vich\UploadableField(mapping="import_csv", fileNameProperty="file")
      * @var File|null
+     * @Assert\File(
+     *     mimeTypes = { "text/csv" },
+     *     mimeTypesMessage = "Choisissez un fichier csv"
+     * )
      */
     private $fileCSV;
 
@@ -95,6 +100,7 @@ class CSV
 
     /**
      * @ORM\Column(type="string", length=255)
+     * @Assert\NotBlank
      */
     private $name;
 

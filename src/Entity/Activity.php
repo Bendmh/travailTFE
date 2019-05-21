@@ -44,6 +44,10 @@ class Activity
     /**
      * @Vich\UploadableField(mapping="activity_image", fileNameProperty="fileName")
      * @var File|null
+     * @Assert\File(
+     *     mimeTypes = { "image/png", "image/jpeg" },
+     *     mimeTypesMessage = "Choisissez une image png ou jpeg"
+     * )
      */
     private $imageFile;
 
