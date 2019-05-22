@@ -5,12 +5,12 @@
 {% block body %}
     <div class="jumbotron">
         <h1>Importer vos CSV</h1>
+        {% for message in app.flashes('error') %}
+            <div class="alert alert-danger">
+                {{ message }}
+            </div>
+        {% endfor %}
     </div>
-    {% for message in app.flashes('error') %}
-        <div class="alert alert-danger">
-            {{ message }}
-        </div>
-    {% endfor %}
     <div class="container">
         <div class="row">
             <div class="col-xs-12 col-lg-7 col-md-7">
@@ -29,6 +29,13 @@
                         'placeholder' : "Choisissez votre fichier (obligatoire)"
                     },
                     'label' : 'Fichier à importer'
+                }) }}
+
+                {{ form_row(form_csv.type, {
+                    'attr' : {
+                        'placeholder' : "Choisissez le type d'import"
+                    },
+                    'label' : 'Type d\'activité'
                 }) }}
 
                 <button class="btn btn-success">Envoyer</button>

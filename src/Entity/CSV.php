@@ -30,10 +30,6 @@ class CSV
     /**
      * @Vich\UploadableField(mapping="import_csv", fileNameProperty="file")
      * @var File|null
-     * @Assert\File(
-     *     mimeTypes = { "text/csv" },
-     *     mimeTypesMessage = "Choisissez un fichier csv"
-     * )
      */
     private $fileCSV;
 
