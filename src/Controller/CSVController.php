@@ -3,12 +3,17 @@
 namespace App\Controller;
 
 use App\Entity\Activity;
+use App\Entity\ActivityType;
 use App\Entity\CSV;
 use App\Entity\Questions;
+use App\Entity\QuestionsGroupes;
+use App\Entity\QuestionsReponses;
 use App\Form\CSVExportType;
+use App\Form\CSVselectAssociationType;
 use App\Form\CSVselectType;
 use App\Form\CSVType;
 use App\Repository\ActivityRepository;
+use App\Repository\ActivityTypeRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use League\Csv\Reader;
 use League\Csv\Writer;
@@ -33,7 +38,15 @@ class CSVController extends AbstractController
             $manager->persist($csv);
             $manager->flush();
 
-            return $this->redirectToRoute('import_csv_id', ['id' => $csv->getId()]);
+            switch ($csv->getType()->getName()){
+                case ActivityType::QCM_ACTIVITY :
+                case ActivityType::ASSOCIATION_ACTIVITY :
+                    return $this->redirectToRoute('import_csv_id', ['id' => $csv->getId()]);
+                    break;
+                default :
+                    $this->addFlash('error', 'Ce type d\'activité n\'est pas encore implémenté');
+                    return $this->redirectToRoute('import_csv');
+            }
         }
 
         return $this->render('csv/step1.html.twig', [
@@ -79,12 +92,22 @@ class CSVController extends AbstractController
                 break;
             default :
                 $this->addFlash('error', 'Le tableau a trop de colonne');
-                $test = true;
                 return $this->redirectToRoute('import_csv');
 
         }
 
-        $form = $this->createForm(CSVselectType::class, $csv);
+        switch ($csv->getType()->getName()){
+            case ActivityType::QCM_ACTIVITY :
+                $form = $this->createForm(CSVselectType::class, $csv);
+                break;
+            case ActivityType::ASSOCIATION_ACTIVITY :
+                $form = $this->createForm(CSVselectAssociationType::class, $csv);
+                break;
+            default :
+                $this->addFlash('error', 'Ce type d\'activité n\'est pas encore implémenté');
+                return $this->redirectToRoute('import_csv');
+        }
+
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
@@ -105,7 +128,7 @@ class CSVController extends AbstractController
      * @Route("/import/csv/{id}/final", name="csv_final")
      * @throws \League\Csv\Exception
      */
-    public function csvFinalStep($id = null, CSV $csv, ObjectManager $manager, ActivityRepository $repository, Request $request){
+    public function csvFinalStep($id = null, CSV $csv, ObjectManager $manager, ActivityRepository $repository, Request $request, ActivityTypeRepository $activityTypeRepository){
 
         $projectDir = $this->getParameter('kernel.project_dir');
         $csvPath = $projectDir . "\public\csv\\" . $csv->getFile();
@@ -113,43 +136,109 @@ class CSVController extends AbstractController
         $csvReturn->setHeaderOffset(0);
         $csvReturn->setDelimiter(';');
         $records = $csvReturn->getRecords();
-        foreach($records as $offset => $record){
+        switch ($csv->getType()->getName()){
+            case ActivityType::QCM_ACTIVITY :
+                foreach($records as $offset => $record){
 
-            $activity = $repository->findOneBy(['name' => $record[$csv->getColumn1()] ]);
+                    $activity = $repository->findOneBy(['name' => $record[$csv->getColumn1()] ]);
 
-            if(!$activity){
-                $activity = new Activity();
-                $activity->setName($record[$csv->getColumn1()]);
-                $activity->setType($csv->getType());
-            }
-            $activity->setCreatedBy($this->getUser());
-            $activity->setVisible(true);
+                    if(!$activity){
+                        $activity = new Activity();
+                        $activity->setName($record[$csv->getColumn1()]);
+                        $type = $activityTypeRepository->findOneBy(['name' => ActivityType::QCM_ACTIVITY]);
+                        $activity->setType($type);
+                    }
+                    $activity->setCreatedBy($this->getUser());
+                    $activity->setVisible(true);
 
-            $question = new Questions();
-            if($csv->getColumn2()){
-                $question->setQuestion($record[$csv->getColumn2()]);
-            }
-            if($csv->getColumn3()){
-                $question->setBonneReponse1($record[$csv->getColumn3()]);
-            }
-            if($csv->getColumn4()){
-                $question->setBonneReponse2($record[$csv->getColumn4()]);
-            }
-            if($csv->getColumn5()){
-                $question->setMauvaiseReponse1($record[$csv->getColumn5()]);
-            }
-            if($csv->getColumn6()){
-                $question->setMauvaiseReponse2($record[$csv->getColumn6()]);
-            }
-            $question->setPoints($record[$csv->getColumn7()]);
+                    $question = new Questions();
+                    if($csv->getColumn2()){
+                        $question->setQuestion($record[$csv->getColumn2()]);
+                    }
+                    if($csv->getColumn3()){
+                        $question->setBonneReponse1($record[$csv->getColumn3()]);
+                    }
+                    if($csv->getColumn4()){
+                        $question->setBonneReponse2($record[$csv->getColumn4()]);
+                    }
+                    if($csv->getColumn5()){
+                        $question->setMauvaiseReponse1($record[$csv->getColumn5()]);
+                    }
+                    if($csv->getColumn6()){
+                        $question->setMauvaiseReponse2($record[$csv->getColumn6()]);
+                    }
+                    $question->setPoints($record[$csv->getColumn7()]);
 
-            $manager->persist($question);
+                    $manager->persist($question);
 
-            $activity->addQuestion($question);
+                    $activity->addQuestion($question);
 
-            $manager->persist($activity);
+                    $manager->persist($activity);
 
-            $manager->flush();
+                    $manager->flush();
+                }
+                break;
+            case ActivityType::ASSOCIATION_ACTIVITY :
+                foreach ($records as $offset => $record) {
+                    $activity = $repository->findOneBy(['name' => $record[$csv->getColumn1()] ]);
+                    if(!$activity){
+                        $activity = new Activity();
+                        $activity->setName($record[$csv->getColumn1()]);
+                        $type = $activityTypeRepository->findOneBy(['name' => ActivityType::ASSOCIATION_ACTIVITY]);
+                        $activity->setType($type);
+                    }
+                    $activity->setCreatedBy($this->getUser());
+                    $activity->setVisible(true);
+
+                    $groupe = new QuestionsGroupes();
+
+                    if($csv->getColumn2()){
+                        $groupe->setName($record[$csv->getColumn2()]);
+                    }
+
+                    $element = new QuestionsReponses();
+                    if($csv->getColumn3()){
+                        $element->setName($record[$csv->getColumn3()]);
+                        $manager->persist($element);
+                        $groupe->addQuestionsReponse($element);
+                    }
+                    $element = new QuestionsReponses();
+                    if($csv->getColumn4()){
+                        $element->setName($record[$csv->getColumn4()]);
+                        $manager->persist($element);
+                        $groupe->addQuestionsReponse($element);
+                    }
+                    $element = new QuestionsReponses();
+                    if($csv->getColumn5()){
+                        $element->setName($record[$csv->getColumn5()]);
+                        $manager->persist($element);
+                        $groupe->addQuestionsReponse($element);
+                    }
+                    $element = new QuestionsReponses();
+                    if($csv->getColumn6()){
+                        $element->setName($record[$csv->getColumn6()]);
+                        $manager->persist($element);
+                        $groupe->addQuestionsReponse($element);
+                    }
+                    $element = new QuestionsReponses();
+                    if($csv->getColumn7()){
+                        $element->setName($record[$csv->getColumn7()]);
+                        $manager->persist($element);
+                        $groupe->addQuestionsReponse($element);
+                    }
+                    $manager->persist($groupe);
+
+                    $activity->addQuestionsGroupe($groupe);
+
+                    $manager->persist($activity);
+
+                    $manager->flush();
+
+                }
+                break;
+            default :
+                $this->addFlash('error', 'Ce type d\'activité n\'est pas encore implémenté');
+                return $this->redirectToRoute('import_csv');
         }
 
         return $this->redirectToRoute('activity');

@@ -2,6 +2,7 @@
 
 namespace App\Repository;
 
+use App\Entity\Classes;
 use App\Entity\ResultSearch;
 use App\Entity\UserActivity;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
@@ -42,7 +43,7 @@ class UserActivityRepository extends ServiceEntityRepository
         return $result;
     }
 
-    public function findAllVisibleQuery(ResultSearch $search){
+    public function findAllVisibleQuery(ResultSearch $search, $classes){
 
             $query = $this
                     ->createQueryBuilder('p')
@@ -53,6 +54,11 @@ class UserActivityRepository extends ServiceEntityRepository
                     ->setParameter('titre', 'ROLE_ELEVE')
                     ->addSelect('q');
 
+            if(!$search->getClasse()){
+                $query = $query
+                    ->andWhere('q.nom in (:classe)')
+                    ->setParameter('classe', $classes);
+            }
             if($search->getClasse()){
                 $query = $query
                     ->andWhere('q.id = :classe')

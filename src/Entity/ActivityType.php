@@ -15,6 +15,11 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
  */
 class ActivityType
 {
+
+    const QCM_ACTIVITY = 'QCM';
+    const ASSOCIATION_ACTIVITY = 'association';
+    const SONDAGE_ACTIVITY = 'sondage';
+
     /**
      * @ORM\Id()
      * @ORM\GeneratedValue()

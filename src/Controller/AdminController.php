@@ -6,8 +6,10 @@ use App\Entity\ActivityType;
 use App\Entity\Classes;
 use App\Form\ActivityTypeType;
 use App\Form\ClasseType;
+use App\Repository\ActivityRepository;
 use App\Repository\ActivityTypeRepository;
 use App\Repository\ClassesRepository;
+use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -126,5 +128,43 @@ class AdminController extends AbstractController
         $manager->remove($classeType);
         $manager->flush();
         return $this->redirectToRoute('admin_list_classes');
+    }
+
+    /**
+     * @param UserRepository $userRepository
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @Route("/admin/users", name="list_user")
+     */
+    public function selectAllUser(UserRepository $userRepository){
+        $userProf = $userRepository->findBy(['titre' => 'ROLE_PROFESSEUR']);
+
+        $userEleve = $userRepository->findBy(['titre' => 'ROLE_ELEVE']);
+
+        return $this->render('admin/listUser.html.twig', [
+            'current_menu' => 'reglage',
+            'listProf' => $userProf,
+            'listEleve' => $userEleve
+        ]);
+    }
+
+    /**
+     * @param $id
+     * @param UserRepository $userRepository
+     * @param ObjectManager $manager
+     * @Route("/admin/delete/{id}", name="delete_user")
+     */
+    public function deleteUser($id, UserRepository $userRepository, ObjectManager $manager, ActivityRepository $activityRepository){
+        $admin = $this->getUser();
+        $user = $userRepository->findOneBy(['id' => $id]);
+        $activities = $activityRepository->findBy(['created_by' => $id]);
+        foreach ($activities as $activity){
+            $activity->setCreatedBy($admin);
+            $manager->persist($activity);
+        }
+        $manager->flush();
+        $manager->remove($user);
+        $manager->flush();
+
+        return $this->redirectToRoute('list_user');
     }
 }

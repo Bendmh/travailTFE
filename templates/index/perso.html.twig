@@ -19,6 +19,7 @@
                 {{ form_row(form_user.nom) }}
                 {{ form_row(form_user.prenom) }}
                 {{ form_row(form_user.pseudo) }}
+                {% if id is null %}
                 <div class="form-group">
                     <label for="userRole">Rôle</label>
                     {% set role = user.titre | split('_') %}
@@ -32,6 +33,7 @@
                         {% endfor %}
                     </select>
                 </div>
+                {% endif %}
                 <div class="text-center">
                     <a href="#"><button class="btn btn-primary">Modifier</button></a>
                 </div>

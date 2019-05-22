@@ -89,8 +89,23 @@ class QuestionSondageController extends AbstractController
             'results' => $reponseSondage,
             'piechart' => $pieChart,
             'total' => $total[0][1],
+            'id' => $id,
             'current_menu' => 'resultat'
         ]);
+    }
+
+    /**
+     * @param $id
+     * @param ReponseSondageRepository $reponseSondageRepository
+     * @param ActivityRepository $activityRepository
+     * @Route("/sondage/{id}/graphique", name="sondage_graphique")
+     */
+    public function dataGraphique($id, ReponseSondageRepository $reponseSondageRepository, ActivityRepository $activityRepository){
+        $questionSondage = $activityRepository->findOneBy(['id' => $id]);
+        $questionSondageId = $questionSondage->getQuestionSondage()->getId();
+        $reponseSondage = $reponseSondageRepository->resultSondage($questionSondageId);
+
+        return $this->json(['code' => 200, 'message' => $reponseSondage], 200);
     }
 
     /**

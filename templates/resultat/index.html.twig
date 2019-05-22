@@ -4,7 +4,7 @@
 
 {% block body %}
     <div class="jumbotron">
-        {% if is_granted('ROLE_PROFESSEUR') %}
+        {% if is_granted('ROLE_PROFESSEUR') and current_menu != 'mesResultat' %}
             <h1>Résultats élèves</h1>
         {% else %}
             <h1>Vos résultats</h1>
@@ -60,7 +60,7 @@
                         <td>{{ result.activityId.name }}</td>
                         <td>{{ result.point }}</td>
                         <td>{{ result.total }}</td>
-                        {% if is_granted('ROLE_PROFESSEUR') and result.activityId.type.id == 41 %}
+                        {% if is_granted('ROLE_PROFESSEUR') %}
                             <td><a class="reponseEleve" href="{{ path('result_student_activity', {'activityId' : result.activityId.id, 'userId' : result.userId.id}) }}"><button class="btn btn-info">Réponses</button></a></td>
                         {% endif %}
                     </tr>
@@ -76,9 +76,9 @@
             <div class="modal-content">
 
                 <!-- Modal Header -->
-                <div class="modal-header">
+                <div class="modal-header" style="background-color: #563d7c; color: white;">
                     <h4 class="modal-title">Réponses de l'élève</h4>
-                    <button type="button" class="close fermer" data-dismiss="modal">&times;</button>
+                    <button style="color: white;" type="button" class="close fermer" data-dismiss="modal">&times;</button>
                 </div>
 
                 <!-- Modal body -->

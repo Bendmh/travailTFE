@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Reponses;
 use App\Entity\User;
+use App\Form\RegistrationType;
 use App\Form\UserChangeDataType;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityTypeRepository;
@@ -38,17 +39,26 @@ class IndexController extends AbstractController
 
     /**
      * @Route("/perso", name="perso")
+     * @Route("/perso/{id}", name="perso_id")
      */
-    public function perso(Request $request, ObjectManager $manager){
+    public function perso($id = null, Request $request, ObjectManager $manager, UserRepository $userRepository){
 
         $MDPChange = false;
-        /** @var User $user */
-        $user = $this->getUser();
+        if($id == null){
+            /** @var User $user */
+            $user = $this->getUser();
+            $form = $this->createForm(UserChangeDataType::class, $user);
+        }
+        else{
+            /** @var User $user */
+            $user = $userRepository->findOneBy(['id' => $id]);
+            $form = $this->createForm(RegistrationType::class, $user);
+        }
         if($user->getMdpOublie() == true){
             $MDPChange = true;
         }
 
-        $form = $this->createForm(UserChangeDataType::class, $user);
+        /*$form = $this->createForm(UserChangeDataType::class, $user);*/
 
         $form->handleRequest($request);
 
@@ -63,6 +73,7 @@ class IndexController extends AbstractController
             'form_user' =>$form->createView(),
             'user' => $user,
             'MDPChange' => $MDPChange,
+            'id' => $id,
             'current_menu' => 'perso'
         ]);
     }

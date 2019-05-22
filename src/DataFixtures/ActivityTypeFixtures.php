@@ -20,7 +20,7 @@ class ActivityTypeFixtures extends Fixture
 
         $type = new ActivityType();
 
-        $type->setName('regroupement');
+        $type->setName('association');
 
         $manager->persist($type);
 

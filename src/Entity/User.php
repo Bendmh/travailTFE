@@ -81,7 +81,7 @@ class User implements UserInterface
     private $classes;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\UserActivity", mappedBy="user_id")
+     * @ORM\OneToMany(targetEntity="App\Entity\UserActivity", mappedBy="user_id", cascade={"persist", "remove"})
      */
     private $activity_id;
 
@@ -91,7 +91,7 @@ class User implements UserInterface
     private $activity_creator;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ReponseSondage", mappedBy="user")
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseSondage", mappedBy="user", cascade={"persist", "remove"})
      */
     private $reponseSondages;
 
@@ -101,9 +101,14 @@ class User implements UserInterface
     private $mdpOublie;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="userId")
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="userId", cascade={"persist", "remove"})
      */
     private $reponseEleveQCMs;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveAssociation", mappedBy="userId")
+     */
+    private $reponseEleveAssociations;
 
 
     public function __construct()
@@ -114,6 +119,7 @@ class User implements UserInterface
         $this->activity_creator = new ArrayCollection();
         $this->reponseSondages = new ArrayCollection();
         $this->reponseEleveQCMs = new ArrayCollection();
+        $this->reponseEleveAssociations = new ArrayCollection();
     }
 
     /**
@@ -390,6 +396,37 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($reponseEleveQCM->getUserId() === $this) {
                 $reponseEleveQCM->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReponseEleveAssociation[]
+     */
+    public function getReponseEleveAssociations(): Collection
+    {
+        return $this->reponseEleveAssociations;
+    }
+
+    public function addReponseEleveAssociation(ReponseEleveAssociation $reponseEleveAssociation): self
+    {
+        if (!$this->reponseEleveAssociations->contains($reponseEleveAssociation)) {
+            $this->reponseEleveAssociations[] = $reponseEleveAssociation;
+            $reponseEleveAssociation->setUserId($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseEleveAssociation(ReponseEleveAssociation $reponseEleveAssociation): self
+    {
+        if ($this->reponseEleveAssociations->contains($reponseEleveAssociation)) {
+            $this->reponseEleveAssociations->removeElement($reponseEleveAssociation);
+            // set the owning side to null (unless already changed)
+            if ($reponseEleveAssociation->getUserId() === $this) {
+                $reponseEleveAssociation->setUserId(null);
             }
         }
 
