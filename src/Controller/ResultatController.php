@@ -70,27 +70,38 @@ class ResultatController extends AbstractController
     public function reponseEleveQCM($userId, $activityId, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityRepository $activityRepository, ReponseEleveAssociationRepository $eleveAssociationRepository){
         $activity = $activityRepository->findOneBy(['id' => $activityId]);
 
-        if($activity->getType()->getName() == ActivityType::QCM_ACTIVITY){
-            $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
+        switch($activity->getType()->getName()){
+            case ActivityType::QCM_ACTIVITY:
+                $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
 
-            $user = $responseEleveQCMList[0]->getUserId();
-            //$activity = $responseEleveQCMList[0]->getActivityId();
+                if(empty($responseEleveQCMList)){
+                    $template = 'Ce n\'était pas encore implémenté';
+                }
+                else{
+                    $user = $responseEleveQCMList[0]->getUserId();
 
-            $template = $this->renderView('resultat/resultPersoQCM.html.twig', [
-                'responseEleveList' => $responseEleveQCMList,
-                'activity' => $activity,
-                'user' => $user
-            ]);
+                    $template = $this->renderView('resultat/resultPersoQCM.html.twig', [
+                        'responseEleveList' => $responseEleveQCMList,
+                        'activity' => $activity,
+                        'user' => $user
+                    ]);
+                }
+                break;
+            case ActivityType::ASSOCIATION_ACTIVITY :
+                $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
+                if(empty($responseEleveAssociationList)){
+                    $template = 'Il n\'y a pas d\'erreur';
+                }
+                else{
+                    $user = $responseEleveAssociationList[0]->getUserId();
+
+                    $template = $this->renderView('resultat/resultPersoAssociation.html.twig', [
+                        'responseEleveList' => $responseEleveAssociationList,
+                    ]);
+                }
+                break;
         }
-        elseif ($activity->getType()->getName() == ActivityType::ASSOCIATION_ACTIVITY){
-            $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
 
-            $user = $responseEleveAssociationList[0]->getUserId();
-
-            $template = $this->renderView('resultat/resultPersoAssociation.html.twig', [
-                'responseEleveList' => $responseEleveAssociationList,
-            ]);
-        }
         $response = new Response('test', 200);
         $json = json_encode($template);
         $response = new Response($json, 200);
