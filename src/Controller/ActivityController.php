@@ -10,6 +10,8 @@ use App\Form\ActivitySearchType;
 use App\Form\ActivityType;
 use App\Repository\ActivityRepository;
 use App\Repository\QuestionsRepository;
+use App\Repository\ReponseEleveAssociationRepository;
+use App\Repository\ReponseEleveQCMRepository;
 use App\Repository\UserActivityRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -165,10 +167,28 @@ class ActivityController extends AbstractController
      * @param ObjectManager $manager
      * @Route("/activity/{id}/delete", name="activity_delete")
      */
-    public function delete($id, ActivityRepository $activityRepository, ObjectManager $manager){
+    public function delete($id, ActivityRepository $activityRepository, ObjectManager $manager, ReponseEleveAssociationRepository $eleveAssociationRepository, ReponseEleveQCMRepository $eleveQCMRepository){
 
         $activity = $activityRepository->findOneby(['id' => $id]);
+
+        switch ($activity->getType()->getName()){
+            case \App\Entity\ActivityType::QCM_ACTIVITY:
+                $reponses = $eleveQCMRepository->findBy(['activityId' => $id]);
+                foreach ($reponses as $reponse){
+                    $manager->remove($reponse);
+                }
+                break;
+            case \App\Entity\ActivityType::ASSOCIATION_ACTIVITY:
+                $reponses = $eleveAssociationRepository->findBy(['activityId' => $id]);
+                foreach ($reponses as $reponse){
+                    $manager->remove($reponse);
+                }
+                break;
+
+        }
+
         $manager->remove($activity);
+
         $manager->flush();
         return $this->redirectToRoute('activityPerso');
     }
