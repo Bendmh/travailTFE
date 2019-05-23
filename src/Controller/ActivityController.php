@@ -83,8 +83,10 @@ class ActivityController extends AbstractController
             if($type){
                 $activity->setType($type);
             }
-
-            $activity->setCreatedBy($this->getUser());
+            $creator = $activity->getCreatedBy();
+            if(!$creator){
+                $activity->setCreatedBy($this->getUser());
+            }
 
             $manager->persist($activity);
 
