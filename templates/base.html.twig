@@ -34,6 +34,9 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ path('activity') }}"> Liste des activités</a>
                                 <a class="dropdown-item" href="{{ path('activityPerso') }}">Mes activités</a>
+                                {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                    <a class="dropdown-item" href="{{ path('activity_all') }}">Toutes les activités</a>
+                                {% endif %}
                             </div>
                         </li>
                         <li class="nav-item {% if current_menu is defined and current_menu == 'csv' %} active {% endif %} dropdown">
