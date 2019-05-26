@@ -42,9 +42,7 @@
                             <th scope="col">Activité</th>
                             <th scope="col">Point</th>
                             <th scope="col">Total</th>
-                            {% if is_granted('ROLE_PROFESSEUR') %}
-                                <th scope="col">Voir ses choix</th>
-                            {% endif %}
+                            <th scope="col">Voir ses choix</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -60,9 +58,7 @@
                         <td>{{ result.activityId.name }}</td>
                         <td>{{ result.point }}</td>
                         <td>{{ result.total }}</td>
-                        {% if is_granted('ROLE_PROFESSEUR') %}
-                            <td><a class="reponseEleve" href="{{ path('result_student_activity', {'activityId' : result.activityId.id, 'userId' : result.userId.id}) }}"><button class="btn btn-info">Réponses</button></a></td>
-                        {% endif %}
+                        <td><a class="reponseEleve" href="{{ path('result_student_activity', {'activityId' : result.activityId.id, 'userId' : result.userId.id}) }}"><button class="btn btn-info">Réponses</button></a></td>
                     </tr>
                 {% endfor %}
                     </tbody>
