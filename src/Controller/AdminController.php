@@ -167,4 +167,19 @@ class AdminController extends AbstractController
 
         return $this->redirectToRoute('list_user');
     }
+
+    /**
+     * @param ActivityRepository $activityRepository
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @Route("/admin/activity/all", name="activity_all")
+     */
+    public function activityAll(ActivityRepository $activityRepository){
+        $activities = $activityRepository->findAll();
+
+        return $this->render('activity/activityList.html.twig', [
+            'activites' => $activities,
+            'current_menu' => 'activity',
+            'perso' => true
+        ]);
+    }
 }
