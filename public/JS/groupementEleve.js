@@ -47,6 +47,9 @@ $(document).ready(function(){
                 $collectionButton.hide();
                 let json = jQuery.parseJSON(response.data.message);
                 $('h3.result').html('Tu as obtenu ' + json.point + ' sur ' + json.total);
+                if(json.point < json.total/2){
+                    $('.lienActivite').removeClass('d-none');
+                }
                 $('h4.enonce').hide();
             })
         }
