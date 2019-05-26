@@ -30,6 +30,7 @@
                     {% set index = index+2 %}
                 {% endfor %}
                 <a href="{{ path('correction_groups', { 'id' : activity.id}) }}" class="final d-none">final</a>
+                <a href="{{ path('activity_association', { 'id' : activity.id}) }}" class="d-none lienActivite">Refaire l'activité</a>
             </div>
         </div>
     </div>
