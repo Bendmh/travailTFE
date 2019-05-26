@@ -82,7 +82,9 @@ class QuestionsGroupesController extends AbstractController
         $activity = $activityRepository->findOneBy(['id' => $id]);
 
         $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $id]);
-        $user_activity->setPoint($json->point);
+        if($user_activity->getPoint() < $json->point){
+            $user_activity->setPoint($json->point);
+        }
         $user_activity->setTotal($json->total);
 
         $responseList = $json->response;
@@ -98,7 +100,7 @@ class QuestionsGroupesController extends AbstractController
 
             foreach ($responseList as $response){
                 $reponseEleveQCM = new ReponseEleveQCM();
-                $activityId = $activityRepository->findOneBy(['id' => $response->activityId]);
+                $activityId = $activityRepository->findOneBy(['id' => $id]);
                 $reponseEleveQCM->setActivityId($activityId);
                 $reponseEleveQCM->setUserId($user);
                 $questionId = $questionsRepository->findOneBy(['id' => $response->questionId]);
