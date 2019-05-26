@@ -32,9 +32,15 @@
                                 {% if test == 'question.bonneReponse1' %}
                                     {% if (question.bonneReponse1) %}
                                         <div class="form-check p-2">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" name="{{ question.id }}" class="bonneReponse"  value="{{ question.bonneReponse1 }}">{{ question.bonneReponse1 }}<br>
-                                            </label>
+                                            {% if(question.uniqueReponse) %}
+                                                <label class="form-check-label">
+                                                    <input type="radio" name="{{ question.id }}" class="bonneReponse"  value="{{ question.bonneReponse1 }}">{{ question.bonneReponse1 }}<br>
+                                                </label>
+                                            {% else %}
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="{{ question.id }}" class="bonneReponse"  value="{{ question.bonneReponse1 }}">{{ question.bonneReponse1 }}<br>
+                                                </label>
+                                            {% endif %}
                                         </div>
                                     {% endif %}
                                 {% elseif test == 'question.bonneReponse2' %}
@@ -56,25 +62,43 @@
                                 {% elseif test == 'question.mauvaiseReponse1' %}
                                     {% if (question.mauvaiseReponse1) %}
                                         <div class="form-check p-2">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse1 }}">{{ question.mauvaiseReponse1 }}<br>
-                                            </label>
+                                            {% if(question.uniqueReponse) %}
+                                                <label class="form-check-label">
+                                                    <input type="radio" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse1 }}">{{ question.mauvaiseReponse1 }}<br>
+                                                </label>
+                                            {% else %}
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse1 }}">{{ question.mauvaiseReponse1 }}<br>
+                                                </label>
+                                            {% endif %}
                                         </div>
                                     {% endif %}
                                 {% elseif test == 'question.mauvaiseReponse2' %}
                                     {% if (question.mauvaiseReponse2) %}
                                         <div class="form-check p-2">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse2 }}">{{ question.mauvaiseReponse2 }}<br>
-                                            </label>
+                                            {% if(question.uniqueReponse) %}
+                                                <label class="form-check-label">
+                                                    <input type="radio" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse2 }}">{{ question.mauvaiseReponse2 }}<br>
+                                                </label>
+                                            {% else %}
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse2 }}">{{ question.mauvaiseReponse2 }}<br>
+                                                </label>
+                                            {% endif %}
                                         </div>
                                     {% endif %}
                                 {% elseif test == 'question.mauvaiseReponse3' %}
                                     {% if (question.mauvaiseReponse3) %}
                                         <div class="form-check p-2">
-                                            <label class="form-check-label">
-                                                <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse3 }}">{{ question.mauvaiseReponse3 }}<br>
-                                            </label>
+                                            {% if(question.uniqueReponse) %}
+                                                <label class="form-check-label">
+                                                    <input type="radio" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse3 }}">{{ question.mauvaiseReponse3 }}<br>
+                                                </label>
+                                            {% else %}
+                                                <label class="form-check-label">
+                                                    <input type="checkbox" name="{{ question.id }}" class="mauvaiseReponse" value="{{ question.mauvaiseReponse3 }}">{{ question.mauvaiseReponse3 }}<br>
+                                                </label>
+                                            {% endif %}
                                         </div>
                                     {% endif %}
                                 {% endif %}

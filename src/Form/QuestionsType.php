@@ -23,6 +23,7 @@ class QuestionsType extends AbstractType
             ->add('mauvaiseReponse_1')
             ->add('mauvaiseReponse_2')
             ->add('mauvaiseReponse_3')
+            ->add('uniqueReponse')
             ->add('points')
         ;
     }
