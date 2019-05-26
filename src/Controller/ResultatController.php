@@ -102,9 +102,7 @@ class ResultatController extends AbstractController
                 break;
         }
 
-        $response = new Response('test', 200);
-        $json = json_encode($template);
-        $response = new Response($json, 200);
+        $response = new Response($template, 200);
         //$response->headers->set('Content-Type', 'application/json');
         return $response;
 
