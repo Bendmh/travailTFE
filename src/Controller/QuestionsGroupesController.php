@@ -10,6 +10,7 @@ use App\Form\QuestionsGroupesType;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityTypeRepository;
 use App\Repository\QuestionsGroupesRepository;
+use App\Repository\QuestionsReponsesRepository;
 use App\Repository\QuestionsRepository;
 use App\Repository\ReponseEleveAssociationRepository;
 use App\Repository\ReponseEleveQCMRepository;
@@ -69,7 +70,7 @@ class QuestionsGroupesController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\JsonResponse
      * @Route("{id}/verification", name="correction_groups")
      */
-    public function correctionGroups($id, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityTypeRepository $activityTypeRepository, ReponseEleveAssociationRepository $eleveAssociationRepository){
+    public function correctionGroups($id, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ReponseEleveAssociationRepository $eleveAssociationRepository, QuestionsReponsesRepository $questionsReponsesRepository, QuestionsGroupesRepository $groupesRepository){
 
         $data = utf8_encode($request->getContent());
 
@@ -93,6 +94,7 @@ class QuestionsGroupesController extends AbstractController
                 foreach ($responseEleveQCMList as $response){
                     $manager->remove($response);
                 }
+                $manager->flush();
                 foreach ($responseList as $response){
                     $questionId = $questionsRepository->findOneBy(['id' => $response->questionId]);
                     if($questionId->getBonneReponse1() == $response->value || $questionId->getBonneReponse2() == $response->value || $questionId->getBonneReponse3() == $response->value){
@@ -122,13 +124,20 @@ class QuestionsGroupesController extends AbstractController
                 $manager->flush();
 
                 foreach($responseList as $response){
-                    $reponseEleveAssociation = new ReponseEleveAssociation();
-                    $activityId = $activityRepository->findOneBy(['id' => $id]);
-                    $reponseEleveAssociation->setActivityId($activityId);
-                    $reponseEleveAssociation->setUserId($user);
-                    $reponseEleveAssociation->setGroupe($response->groupe);
-                    $reponseEleveAssociation->setReponse($response->reponse);
-                    $manager->persist($reponseEleveAssociation);
+                    $reponseDB = $questionsReponsesRepository->findOneBy(['id' => $response->reponse]);
+                    $groupeDB = $groupesRepository->findOneBy(['id' => $response->groupe]);
+                    if($reponseDB->getQuestion()->getId() == $response->groupe){
+                        $point++;
+                    }
+                    else{
+                        $reponseEleveAssociation = new ReponseEleveAssociation();
+                        $activityId = $activityRepository->findOneBy(['id' => $id]);
+                        $reponseEleveAssociation->setActivityId($activityId);
+                        $reponseEleveAssociation->setUserId($user);
+                        $reponseEleveAssociation->setGroupe($groupeDB->getName());
+                        $reponseEleveAssociation->setReponse($reponseDB->getName());
+                        $manager->persist($reponseEleveAssociation);
+                    }
                 }
                 break;
         }
