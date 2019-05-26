@@ -65,7 +65,7 @@ class ResultatController extends AbstractController
     }
 
     /**
-     * @Route("/resultat/{activityId}/{userId}", name="result_student_activity")
+     * @Route("/point/{activityId}/{userId}", name="result_student_activity")
      */
     public function reponseEleveQCM($userId, $activityId, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityRepository $activityRepository, ReponseEleveAssociationRepository $eleveAssociationRepository){
         $activity = $activityRepository->findOneBy(['id' => $activityId]);
