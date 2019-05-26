@@ -76,68 +76,72 @@ class QuestionsGroupesController extends AbstractController
         $json = json_decode($data);
 
         $user = $this->getUser();
-        $typeQCM = $activityTypeRepository->findOneBy(['name' => ActivityType::QCM_ACTIVITY]);
-        $typeAssociation = $activityTypeRepository->findOneBy(['name' => ActivityType::ASSOCIATION_ACTIVITY]);
+
+        $point = 0;
 
         $activity = $activityRepository->findOneBy(['id' => $id]);
 
         $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $id]);
-        if($user_activity->getPoint() < $json->point){
-            $user_activity->setPoint($json->point);
-        }
         $user_activity->setTotal($json->total);
 
         $responseList = $json->response;
 
-        //Si l'activité est du type QCM on enregistre les résultats (pour le moment)
-        if($activity->getType()->getId() == $typeQCM->getId()){
+        // enregistrement des mauvaises réponses de l'élève
+        switch ($activity->getType()->getName()){
+            case ActivityType::QCM_ACTIVITY :
+                $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                foreach ($responseEleveQCMList as $response){
+                    $manager->remove($response);
+                }
+                foreach ($responseList as $response){
+                    $questionId = $questionsRepository->findOneBy(['id' => $response->questionId]);
+                    if($questionId->getBonneReponse1() == $response->value || $questionId->getBonneReponse2() == $response->value || $questionId->getBonneReponse3() == $response->value){
+                        $point++;
+                    }
+                    else{
+                        $point--;
+                        $reponseEleveQCM = new ReponseEleveQCM();
+                        $activityId = $activityRepository->findOneBy(['id' => $id]);
+                        $reponseEleveQCM->setActivityId($activityId);
+                        $reponseEleveQCM->setUserId($user);
+                        $reponseEleveQCM->setQuestionId($questionId);
+                        $reponseEleveQCM->setReponse($response->value);
+                        $manager->persist($reponseEleveQCM);
+                    }
+                    if($user_activity->getPoint() < $point){
+                        $user_activity->setPoint($point);
+                    }
+                }
+                break;
+            case ActivityType::ASSOCIATION_ACTIVITY :
+                //je supprime les réponses déjà existantes
+                $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                foreach ($responseEleveAssociationList as $response){
+                    $manager->remove($response);
+                }
+                $manager->flush();
 
-            //je supprime les réponses déjà existantes
-            $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
-            foreach ($responseEleveQCMList as $response){
-                $manager->remove($response);
-            }
-
-            foreach ($responseList as $response){
-                $reponseEleveQCM = new ReponseEleveQCM();
-                $activityId = $activityRepository->findOneBy(['id' => $id]);
-                $reponseEleveQCM->setActivityId($activityId);
-                $reponseEleveQCM->setUserId($user);
-                $questionId = $questionsRepository->findOneBy(['id' => $response->questionId]);
-                $reponseEleveQCM->setQuestionId($questionId);
-                $reponseEleveQCM->setReponse($response->value);
-                $manager->persist($reponseEleveQCM);
-            }
+                foreach($responseList as $response){
+                    $reponseEleveAssociation = new ReponseEleveAssociation();
+                    $activityId = $activityRepository->findOneBy(['id' => $id]);
+                    $reponseEleveAssociation->setActivityId($activityId);
+                    $reponseEleveAssociation->setUserId($user);
+                    $reponseEleveAssociation->setGroupe($response->groupe);
+                    $reponseEleveAssociation->setReponse($response->reponse);
+                    $manager->persist($reponseEleveAssociation);
+                }
+                break;
         }
-        //Si elle est de type association
-        elseif ($activity->getType()->getId() == $typeAssociation->getId()){
-
-            //je supprime les réponses déjà existantes
-            $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
-            foreach ($responseEleveAssociationList as $response){
-                $manager->remove($response);
-            }
-            $manager->flush();
-
-            foreach($responseList as $response){
-                $reponseEleveAssociation = new ReponseEleveAssociation();
-                $activityId = $activityRepository->findOneBy(['id' => $id]);
-                $reponseEleveAssociation->setActivityId($activityId);
-                $reponseEleveAssociation->setUserId($user);
-                $reponseEleveAssociation->setGroupe($response->groupe);
-                $reponseEleveAssociation->setReponse($response->reponse);
-                $manager->persist($reponseEleveAssociation);
-            }
-        }
-
 
         $manager->persist($user_activity);
         $manager->flush();
+
+        $response = json_encode(['point' => $point, 'total' => $json->total]);
 
         //Permet de récupérer les données que je passe en ajax.
         //$total = $json->total;
 
 
-        return $this->json(['code' => 200, 'message' => $data], 200);
+        return $this->json(['code' => 200, 'message' => $response], 200);
     }
 }
