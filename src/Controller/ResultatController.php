@@ -75,7 +75,7 @@ class ResultatController extends AbstractController
                 $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
 
                 if(empty($responseEleveQCMList)){
-                    $template = 'Ce n\'était pas encore implémenté';
+                    $template = 'Ce n\'était pas encore implémenté ou il n\' a pas d\'erreur';
                 }
                 else{
                     $user = $responseEleveQCMList[0]->getUserId();
@@ -90,7 +90,7 @@ class ResultatController extends AbstractController
             case ActivityType::ASSOCIATION_ACTIVITY :
                 $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
                 if(empty($responseEleveAssociationList)){
-                    $template = 'Il n\'y a pas d\'erreur';
+                    $template = 'Ce n\'était pas encore implémenté ou il n\' a pas d\'erreur';
                 }
                 else{
                     $user = $responseEleveAssociationList[0]->getUserId();
