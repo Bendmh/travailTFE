@@ -29,7 +29,7 @@ class QuestionsGroupesController extends AbstractController
      * @Route("activity/{id}/association/new", name="activity_association_new")
      * @Route("activity/{id}/association/{slug}/edit", name="activity_association_edit")
      */
-    public function questionsGroups($id, $slug = null, ObjectManager $manager, Request $request, ActivityRepository $activityRepository, QuestionsGroupesRepository $groupesRepository){
+    public function questionsGroups($id, $slug = null, ObjectManager $manager, Request $request, ActivityRepository $activityRepository, QuestionsGroupesRepository $groupesRepository, QuestionsReponsesRepository $questionsReponsesRepository){
 
         $question = $groupesRepository->findOneby(['id' => $slug]);
 
@@ -45,6 +45,11 @@ class QuestionsGroupesController extends AbstractController
         if($form->isSubmitted() && $form->isValid()){
             $question->setActivity($activities);
 
+            $questionRemoveAll = $questionsReponsesRepository->findBy(['question' => null]);
+            foreach ($questionRemoveAll as $item){
+                $manager->remove($item);
+            }
+
             $manager->persist($question);
             $manager->flush();
 
@@ -58,7 +63,8 @@ class QuestionsGroupesController extends AbstractController
 
         return $this->render('questions_groupes/index.html.twig', [
             'form' => $form->createView(),
-            'activity' => $activities
+            'activity' => $activities,
+            'slug' => $slug
         ]);
     }
 
@@ -110,9 +116,9 @@ class QuestionsGroupesController extends AbstractController
                         $reponseEleveQCM->setReponse($response->value);
                         $manager->persist($reponseEleveQCM);
                     }
-                    if($user_activity->getPoint() < $point){
-                        $user_activity->setPoint($point);
-                    }
+                }
+                if(is_null($user_activity->getPoint()) || $user_activity->getPoint() < $point){
+                    $user_activity->setPoint($point);
                 }
                 break;
             case ActivityType::ASSOCIATION_ACTIVITY :
@@ -139,6 +145,9 @@ class QuestionsGroupesController extends AbstractController
                         $manager->persist($reponseEleveAssociation);
                     }
                 }
+                if(is_null($user_activity->getPoint()) || $user_activity->getPoint() < $point){
+                    $user_activity->setPoint($point);
+                }
                 break;
         }
 
@@ -152,5 +161,20 @@ class QuestionsGroupesController extends AbstractController
 
 
         return $this->json(['code' => 200, 'message' => $response], 200);
+    }
+
+    /**
+     * @param $groupId
+     * @param ObjectManager $manager
+     * @Route("/{groupId}/delete", name="groupe_delete")
+     */
+    public function deleteGroupe($groupId, ObjectManager $manager, QuestionsGroupesRepository $groupesRepository){
+
+        $groupId = $groupesRepository->findOneBy(['id' => $groupId]);
+        $activityId = $groupId->getActivity()->getId();
+        $manager->remove($groupId);
+        $manager->flush();
+
+        return $this->redirectToRoute('activity_association', ['id' => $activityId]);
     }
 }

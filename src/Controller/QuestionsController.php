@@ -7,6 +7,7 @@ use App\Entity\Questions;
 use App\Form\QuestionsType;
 use App\Repository\ActivityRepository;
 use App\Repository\QuestionsRepository;
+use App\Repository\ReponseEleveQCMRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -19,7 +20,7 @@ class QuestionsController extends AbstractController
      * @Route("activity/{id}/questions/new", name="activity_QCM_new")
      * @Route("activity/{id}/questions/{slug}/edit", name="activity_QCM_edit")
      */
-    public function index($id, $slug = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository)
+    public function createOrEditQuestions($id, $slug = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository)
     {
         $question = $questionsRepository->findOneby(['id' => $slug]);
 
@@ -62,10 +63,22 @@ class QuestionsController extends AbstractController
 
     /**
      * @Route("activity/{id}/questions/{slug}/delete", name="activity_question_delete")
+     * @param $id
+     * @param $slug
+     * @param QuestionsRepository $questionRepository
+     * @param ObjectManager $manager
+     * @param ReponseEleveQCMRepository $eleveQCMRepository
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function delete($id, $slug, QuestionsRepository $questionRepository, ObjectManager $manager){
+    public function delete($id, $slug, QuestionsRepository $questionRepository, ObjectManager $manager, ReponseEleveQCMRepository $eleveQCMRepository){
 
         $question = $questionRepository->findOneBy(['id' => $slug]);
+        $reponses = $eleveQCMRepository->findBy(['questionId' => $slug]);
+
+        foreach ($reponses as $reponse){
+            $manager->remove($reponse);
+        }
+        $manager->flush();
 
         $manager->remove($question);
         $manager->flush();
