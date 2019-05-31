@@ -141,4 +141,30 @@ class IndexController extends AbstractController
             'current_menu' => 'reglage'
         ]);
     }
+
+    /**
+     * @param $id
+     * @param UserRepository $userRepository
+     * @param ObjectManager $manager
+     * @Route("/changeRole", name="change_role")
+     */
+    public function changeRole(UserRepository $userRepository, ObjectManager $manager){
+        /** @var User $user */
+        $user = $this->getUser();
+        $role = $user->getTitre();
+
+        if($role == 'ROLE_PROFESSEUR'){
+            $user->setTitre('ROLE_ELEVE_TEST');
+        }
+        else{
+            $user->setTitre('ROLE_PROFESSEUR');
+        }
+
+        $manager->persist($user);
+        $manager->flush();
+
+
+
+        return $this->redirectToRoute('index');
+    }
 }
