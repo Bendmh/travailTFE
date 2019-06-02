@@ -21,7 +21,7 @@
                     {% for question in activity.question %}
                         {% if is_granted('ROLE_PROFESSEUR') and activity.createdBy.id == app.user.id %}
                             <a href="{{ path('activity_' ~ activity.type.name ~ '_edit', {'id' : activity.id, 'slug' : question.id}) }}" class="btn btn-secondary">Modifier</a>
-                            <a href="{{ path('activity_question_delete', {'id' : activity.id, 'slug' : question.id}) }}" class="btn btn-danger">Supprimer</a>
+                            <a href="{{ path('activity_' ~ activity.type.name ~ '_delete', {'id' : activity.id, 'slug' : question.id}) }}" class="btn btn-danger">Supprimer</a>
                         {% endif %}
                         <h2>{{ question.question }}</h2>
                         {% if question.fileName %}

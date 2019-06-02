@@ -4,7 +4,11 @@
 
 {% block body %}
     <div class="jumbotron">
-        <h1>Ma page</h1>
+        {% if id %}
+            <h1>Page de l'élève</h1>
+        {% else %}
+            <h1>Ma page</h1>
+        {% endif %}
         {% for message in app.flashes('success') %}
             <div class="alert alert-success">
                 {{ message }}
@@ -14,11 +18,28 @@
     <div class="container">
         <div class="row">
             <div class="col-12 col-lg-9 col-md-9">
-                <div class="text-center">Vous êtes libre de changer votre nom, prénom et pseudo</div>
                 {{ form_start(form_user) }}
-                {{ form_row(form_user.nom) }}
-                {{ form_row(form_user.prenom) }}
-                {{ form_row(form_user.pseudo) }}
+                {% if id %}
+                    <div class="text-center">Vous pouvez changer la classe unique</div>
+                    <div class="form-group">
+                        <label for="userRole">Nom</label>
+                        <input type="text" id="userName" value='{{ user.nom }}' disabled class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Prénom</label>
+                        <input type="text" id="userFirstname" value='{{ user.prenom }}' disabled class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="userRole">Pseudo</label>
+                        <input type="text" id="userPseudo" value='{{ user.pseudo }}' disabled class="form-control">
+                    </div>
+                    {{ form_row(form_user.classes, {'label' : 'Classe (choisir une seule pour l\'élève)'}) }}
+                {% else %}
+                    <div class="text-center">Vous êtes libre de changer votre nom, prénom et pseudo</div>
+                    {{ form_row(form_user.nom) }}
+                    {{ form_row(form_user.prenom) }}
+                    {{ form_row(form_user.pseudo) }}
+                {% endif %}
                 {% if id is null %}
                 <div class="form-group">
                     <label for="userRole">Rôle</label>
