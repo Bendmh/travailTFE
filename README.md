@@ -30,7 +30,7 @@ Commande à effectuer dans le dossier source du serveur
     ```
     
 6.	Création du super_admin : 
-    Dans le fichier /src/DataFixtures/UserFixtures.php, définir votre nom, prénom, pseudo et le mot de passe
+    dans le fichier src/DataFixtures/UserFixtures.php, définir votre nom, prénom, pseudo et le mot de passe.
     Ensuite lancer la commande : 
     ```
     php bin/console doctrine:fixtures:load
