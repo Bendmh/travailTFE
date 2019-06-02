@@ -77,7 +77,7 @@ class QuestionSondage
     private $activity;
 
     /**
-     * @ORM\OneToMany(targetEntity="App\Entity\ReponseSondage", mappedBy="questionSondage")
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseSondage", mappedBy="questionSondage", cascade={"persist", "remove"})
      */
     private $response;
 
