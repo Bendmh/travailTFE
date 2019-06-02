@@ -29,13 +29,20 @@ Commande à effectuer dans le dossier source du serveur
     php bin/console doctrine:schema:update –force
     ```
     
-6.	Changer l'environnement et la barre de debug dans .env : 
+6.	Création du super_admin : 
+    Dans le fichier /src/DataFixtures/UserFixtures.php, définir votre nom, prénom, pseudo et le mot de passe
+    Ensuite lancer la commande : 
+    ```
+    php bin/console doctrine:fixtures:load
+    ```
+    
+7.	Changer l'environnement et la barre de debug dans .env : 
     ```
     APP_ENV=prod
     APP_DEBUG=0
     ```
 
-7.	Vider le cache : 
+8.	Vider le cache : 
     ```
     php bin/console cache:clear
     php bin/console cache:clear --env=prod
