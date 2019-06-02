@@ -5,6 +5,11 @@
 {% block body %}
     <div class="jumbotron">
         <h1>Association</h1>
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
     </div>
 
     <div class="container">
@@ -13,25 +18,37 @@
                 <h3 class="result"></h3>
                 <h4 class="enonce mb-4">Associe chaque élément au bon groupe.</h4>
                 {% for answer in answers | shuffle() %}
-                    <h3 name="{{ answer.question.name }}" class="response">{{ answer.name }}</h3>
+                    <h3 name="{{ answer.id }}" class="response">{{ answer.name }}</h3>
                 {% endfor %}
                 {% set index = 0 %}
                 {% for question in activity.questionsGroupes | batch(2) %}
                     <div class="row">
                         <div class="col-6 col-sm-6 col-lg-6 col-md-6">
-                            <button name="{{ question[index+0].name }}" class="btn btn-primary groups w-100 mb-3">{{ question[index+0].name }}</button>
+                            <button name="{{ question[index+0].id }}" class="btn btn-primary groups w-100 mb-3">{{ question[index+0].name }}</button>
+                            {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_PROFESSEUR') and activity.createdBy == app.user %}
+                                <a href="{{ path('activity_association_edit', {'id' : activity.id, 'slug' : question[index+0].id }) }}"><button class="btn btn-secondary">Modifier</button></a>
+                                <a href="{{ path('groupe_delete', {'groupId' : question[index+0].id }) }}"><button class="btn btn-danger">Supprimer</button></a>
+                            {% endif %}
                         </div>
                         <div class="col-6 col-sm-6 col-lg-6 col-md-6">
                             {% if question[index+1] is defined %}
-                                <button name="{{ question[index+1].name }}" class="btn btn-primary groups w-100 mb-3">{{ question[index+1].name }}</button>
+                                <button name="{{ question[index+1].id }}" class="btn btn-primary groups w-100 mb-3">{{ question[index+1].name }}</button>
+                                {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_PROFESSEUR') and activity.createdBy == app.user %}
+                                    <a href="{{ path('activity_association_edit', {'id' : activity.id, 'slug' : question[index+1].id }) }}"><button class="btn btn-secondary">Modifier</button></a>
+                                    <a href="{{ path('groupe_delete', {'groupId' : question[index+1].id }) }}"><button class="btn btn-danger">Supprimer</button></a>
+                                {% endif %}
                             {% endif %}
                         </div>
                     </div>
                     {% set index = index+2 %}
                 {% endfor %}
                 <a href="{{ path('correction_groups', { 'id' : activity.id}) }}" class="final d-none">final</a>
+                <a href="{{ path('activity_association', { 'id' : activity.id}) }}" class="d-none lienActivite">Refaire l'activité</a>
             </div>
         </div>
+        {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_PROFESSEUR') and activity.createdBy == app.user %}
+            <a href="{{ path('activity_association_new', {'id' : activity.id }) }}"><button class="btn btn-info mt-3">Ajouter un groupe</button></a>
+        {% endif %}
     </div>
 
 

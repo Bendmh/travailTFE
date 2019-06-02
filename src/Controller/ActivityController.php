@@ -19,15 +19,23 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class ActivityController
+ * @package App\Controller
+ *
+ * Cette classe gère tout ce qui est lié aux activités (liste, création, modification et suppression)
+ */
 class ActivityController extends AbstractController
 {
     /**
+     * Route pour voir toutes les activités visibles de tous les professeurs
+     *
      * @Route("/activity", name="activity")
      * @param ActivityRepository $activityRepository
      * @param Request $request
      * @return Response
      */
-    public function showActivities(ActivityRepository $activityRepository, Request $request)
+    public function showVisibleActivities(ActivityRepository $activityRepository, Request $request)
     {
         $search = new ActivitySearch();
         $form = $this->createForm(ActivitySearchType::class, $search);
@@ -43,6 +51,8 @@ class ActivityController extends AbstractController
     }
 
     /**
+     * Route permettant aux professeurs de voir ses activités et les gérer
+     *
      * @param ActivityRepository $activityRepository
      * @return Response
      * @Route("/activity/perso", name="activityPerso")
@@ -59,6 +69,8 @@ class ActivityController extends AbstractController
     }
 
     /**
+     * Route permettant la création et la modification des activités
+     *
      * @Route("/activity/new", name="new_activity")
      * @Route("/activity/{id}/edit", name="edit_activity")
      * @param null $id
@@ -67,7 +79,7 @@ class ActivityController extends AbstractController
      * @param ObjectManager $manager
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function create($id = null, Activity $activity = null, Request $request, ObjectManager $manager){
+    public function newOrEditActivity($id = null, Activity $activity = null, Request $request, ObjectManager $manager){
 
         if(!$activity){
             $activity = new Activity();
@@ -83,16 +95,21 @@ class ActivityController extends AbstractController
             if($type){
                 $activity->setType($type);
             }
-
-            $activity->setCreatedBy($this->getUser());
+            $creator = $activity->getCreatedBy();
+            if(!$creator){
+                $activity->setCreatedBy($this->getUser());
+            }
 
             $manager->persist($activity);
 
             $manager->flush();
 
+            //Après la création => formulaire vers la création de nouvelles questions
             if(!$id){
                 return $this->redirectToRoute('activity_'. $activity->getType()->getName() .'_new', ['id' => $activity->getId()]);
-            }else {
+            }
+            //sinon renvoie vers les activités du prof avec le message correspondant
+            else {
                 $this->addFlash('success', 'Activité modifiée avec succès');
                 return $this->redirectToRoute('activityPerso');
             }
@@ -107,6 +124,41 @@ class ActivityController extends AbstractController
         ]);
     }
 
+
+    /**
+     * Route permettant la suppression d'une activité
+     *
+     * @param Activity $activity
+     * @param ObjectManager $manager
+     * @Route("/activity/{id}/delete", name="delete_activity")
+     */
+    public function deleteActivity($id, ActivityRepository $activityRepository, ObjectManager $manager, ReponseEleveAssociationRepository $eleveAssociationRepository, ReponseEleveQCMRepository $eleveQCMRepository){
+
+        $activity = $activityRepository->findOneby(['id' => $id]);
+
+        //selon le type d'activité, je dois supprimer les résultats des élèves correspondant à cette activité.
+        switch ($activity->getType()->getName()){
+            case \App\Entity\ActivityType::QCM_ACTIVITY:
+                $reponses = $eleveQCMRepository->findBy(['activityId' => $id]);
+                foreach ($reponses as $reponse){
+                    $manager->remove($reponse);
+                }
+                break;
+            case \App\Entity\ActivityType::ASSOCIATION_ACTIVITY:
+                $reponses = $eleveAssociationRepository->findBy(['activityId' => $id]);
+                foreach ($reponses as $reponse){
+                    $manager->remove($reponse);
+                }
+                break;
+
+        }
+
+        $manager->remove($activity);
+
+        $manager->flush();
+        return $this->redirectToRoute('activityPerso');
+    }
+
     /**
      * @Route("{id}/verification/qcm", name="verification_qcm")
      * @param $id
@@ -116,7 +168,7 @@ class ActivityController extends AbstractController
      * @param ObjectManager $manager
      * @return Response
      */
-    public function verification($id, Request $request, QuestionsRepository $questionRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager){
+    /*public function verification($id, Request $request, QuestionsRepository $questionRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager){
 
         $point = 0;
         $total = 0;
@@ -160,36 +212,5 @@ class ActivityController extends AbstractController
             'total' => $total,
             'id' => $id
         ]);
-    }
-
-    /**
-     * @param Activity $activity
-     * @param ObjectManager $manager
-     * @Route("/activity/{id}/delete", name="activity_delete")
-     */
-    public function delete($id, ActivityRepository $activityRepository, ObjectManager $manager, ReponseEleveAssociationRepository $eleveAssociationRepository, ReponseEleveQCMRepository $eleveQCMRepository){
-
-        $activity = $activityRepository->findOneby(['id' => $id]);
-
-        switch ($activity->getType()->getName()){
-            case \App\Entity\ActivityType::QCM_ACTIVITY:
-                $reponses = $eleveQCMRepository->findBy(['activityId' => $id]);
-                foreach ($reponses as $reponse){
-                    $manager->remove($reponse);
-                }
-                break;
-            case \App\Entity\ActivityType::ASSOCIATION_ACTIVITY:
-                $reponses = $eleveAssociationRepository->findBy(['activityId' => $id]);
-                foreach ($reponses as $reponse){
-                    $manager->remove($reponse);
-                }
-                break;
-
-        }
-
-        $manager->remove($activity);
-
-        $manager->flush();
-        return $this->redirectToRoute('activityPerso');
-    }
+    }*/
 }

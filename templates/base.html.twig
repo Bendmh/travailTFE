@@ -34,6 +34,9 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ path('activity') }}"> Liste des activités</a>
                                 <a class="dropdown-item" href="{{ path('activityPerso') }}">Mes activités</a>
+                                {% if is_granted('ROLE_SUPER_ADMIN') %}
+                                    <a class="dropdown-item" href="{{ path('activity_all') }}">Toutes les activités</a>
+                                {% endif %}
                             </div>
                         </li>
                         <li class="nav-item {% if current_menu is defined and current_menu == 'csv' %} active {% endif %} dropdown">
@@ -62,6 +65,12 @@
                         </li>
                     {% endif %}
 
+                    {% if is_granted('ROLE_ELEVE_TEST') %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ path('change_role') }}">Rôle professeur</a>
+                        </li>
+                    {% endif %}
+
                     {% if is_granted('ROLE_PROFESSEUR') %}
                         <li class="nav-item {% if current_menu is defined and current_menu == 'resultat' %} active {% endif %} dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -82,6 +91,9 @@
                                     <a class="dropdown-item" href="{{ path('admin_list_classes') }}">Listes des classes</a>
                                     <a class="dropdown-item" href="{{ path('admin_list_type') }}">Types d'activité</a>
                                     <a class="dropdown-item" href="{{ path('list_user') }}">Liste utilisateurs</a>
+                                {% else %}
+                                    <a class="dropdown-item" href="{{ path('change_role') }}">Passer étudiant</a>
+                                    <a class="dropdown-item" href="{{ path('list_user') }}">Assigner une classe</a>
                                 {% endif %}
                             </div>
                         </li>

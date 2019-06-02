@@ -21,9 +21,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class CSVController
+ * @package App\Controller
+ *
+ * Cette classe concerne l'import et export de fichiers CSV
+ */
 class CSVController extends AbstractController
 {
     /**
+     * Route permettant d'enregistrer le fichier CSV dans la base de données. Ce choix m'a permis plus facilement d'associer les
+     * colonnes du fichiers aux données des activités
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \League\Csv\Exception
      * @Route("/import/csv", name="import_csv")
@@ -38,6 +47,7 @@ class CSVController extends AbstractController
             $manager->persist($csv);
             $manager->flush();
 
+            //Ce switch permet de gérer les imports qui sont implémentés ou non
             switch ($csv->getType()->getName()){
                 case ActivityType::QCM_ACTIVITY :
                 case ActivityType::ASSOCIATION_ACTIVITY :
@@ -57,6 +67,8 @@ class CSVController extends AbstractController
 
 
     /**
+     * Route permettant de vérifier le tableau CSV ainsi que d'envoyer le formulaire correspondant à l'import
+     *
      * @param null $id
      * @param CSV $csv
      * @param Request $request
@@ -125,10 +137,12 @@ class CSVController extends AbstractController
     }
 
     /**
+     * Route permettant la création des activités selon le type correspondant au début de l'import
+     *
      * @Route("/import/csv/{id}/final", name="csv_final")
      * @throws \League\Csv\Exception
      */
-    public function csvFinalStep($id = null, CSV $csv, ObjectManager $manager, ActivityRepository $repository, Request $request, ActivityTypeRepository $activityTypeRepository){
+    public function csvCreationActivity($id = null, CSV $csv, ObjectManager $manager, ActivityRepository $repository, Request $request, ActivityTypeRepository $activityTypeRepository){
 
         $projectDir = $this->getParameter('kernel.project_dir');
         $csvPath = $projectDir . "\public\csv\\" . $csv->getFile();
@@ -245,14 +259,15 @@ class CSVController extends AbstractController
     }
 
     /**
+     * Route permettant l'export des activités du type QCM pour le moment
+     *
      * @param Request $request
-     * @param ObjectManager $manager
      * @return \Symfony\Component\HttpFoundation\Response
      * @Route("/export/csv", name="export_csv")
      * @throws \TypeError
      * @throws \League\Csv\Exception
      */
-    public function exportActivityCsv(Request $request, ObjectManager $manager, ActivityRepository $activityRepository){
+    public function exportActivityCsv(Request $request, ActivityRepository $activityRepository){
 
         $csv = new CSV();
         $form = $this->createForm(CSVExportType::class, $csv);

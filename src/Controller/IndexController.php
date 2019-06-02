@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Reponses;
 use App\Entity\User;
+use App\Form\AssignClassesType;
 use App\Form\RegistrationType;
 use App\Form\UserChangeDataType;
 use App\Repository\ActivityRepository;
@@ -16,9 +17,17 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class IndexController
+ * @package App\Controller
+ *
+ * Cette classe permet quelques routes pour les utilisateurs
+ */
 class IndexController extends AbstractController
 {
     /**
+     * Route pour la page de garde du site
+     *
      * @Route("/", name="index")
      */
     public function index(ActivityTypeRepository $activityTypeRepository)
@@ -38,21 +47,26 @@ class IndexController extends AbstractController
     }
 
     /**
+     * Route permettant à l'utilisateur de voir ses données personnelles et de les modifier
+     * Route permettant à l'admin ou professeurs d'assigner une classe à un prof (admin) ou élève (prof et admin)
+     *
      * @Route("/perso", name="perso")
      * @Route("/perso/{id}", name="perso_id")
      */
-    public function perso($id = null, Request $request, ObjectManager $manager, UserRepository $userRepository){
+    public function pagePerso($id = null, Request $request, ObjectManager $manager, UserRepository $userRepository){
 
         $MDPChange = false;
         if($id == null){
             /** @var User $user */
             $user = $this->getUser();
             $form = $this->createForm(UserChangeDataType::class, $user);
+            $currentMenu = 'perso';
         }
         else{
             /** @var User $user */
             $user = $userRepository->findOneBy(['id' => $id]);
-            $form = $this->createForm(RegistrationType::class, $user);
+            $form = $this->createForm(AssignClassesType::class, $user);
+            $currentMenu = 'reglage';
         }
         if($user->getMdpOublie() == true){
             $MDPChange = true;
@@ -74,71 +88,54 @@ class IndexController extends AbstractController
             'user' => $user,
             'MDPChange' => $MDPChange,
             'id' => $id,
-            'current_menu' => 'perso'
+            'current_menu' => $currentMenu
         ]);
     }
 
     /**
-     * @param UserRepository $repository
-     * @Route("/list/MDPoublie", name="MDP_oublie")
-     */
-    public function listMDPoublie(UserRepository $repository){
-        $userList = $repository->findBy(['mdpOublie' => true]);
-        return $this->render('index/listMDPoublie.html.twig', [
-            'userList' => $userList,
-            'current_menu' => 'reglage'
-        ]);
-    }
-
-    /**
-     * @param Request $request
-     * @param UserPasswordEncoderInterface $encoder
+     * Route permettant à un professeur de changer son role pour visualiser la plateforme comme un élève
+     *
+     * @param $id
+     * @param UserRepository $userRepository
      * @param ObjectManager $manager
-     * @Route("/nouveauMDP", name="nouveau_MDP")
+     * @Route("/changeRole", name="change_role")
      */
-    public function nouveauMDP(Request $request, UserPasswordEncoderInterface $encoder, ObjectManager $manager){
+    public function changeRole(UserRepository $userRepository, ObjectManager $manager){
         /** @var User $user */
         $user = $this->getUser();
-        $MDP = $request->request->get('_password');
+        $role = $user->getTitre();
 
-        $MDPChange = false;
-        if($user->getMdpOublie() == true){
-            $MDPChange = true;
+        if($role == 'ROLE_PROFESSEUR'){
+            $user->setTitre('ROLE_ELEVE_TEST');
+        }
+        else{
+            $user->setTitre('ROLE_PROFESSEUR');
         }
 
-        $user->setPassword($encoder->encodePassword($user, $MDP));
-        $user->setMdpOublie(false);
-        $this->addFlash('success', 'Votre mot de passe a bien été changé');
         $manager->persist($user);
         $manager->flush();
 
-        return $this->redirectToRoute('perso');
+
+
+        return $this->redirectToRoute('index');
     }
 
     /**
-     * @param Request $request
-     * @param UserRepository $repository
-     * @param UserPasswordEncoderInterface $encoder
-     * @param ObjectManager $manager
+     * Route permettant de récupérer tous les utilisateurs mais les profs et les élèves séparément
+     *
+     * @param UserRepository $userRepository
      * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/change/MDPoublie", name="change_MDP")
+     * @Route("/list/users", name="list_user")
      */
-    public function changerMDP(Request $request, UserRepository $repository, UserPasswordEncoderInterface $encoder, ObjectManager $manager){
-        $userMDPChanged = $request->request;
-        $MDP = $request->request->get('_password');
-        foreach ($userMDPChanged as $key => $value){
-            if($key != '_password'){
-                $user = $repository->findOneBy(['pseudo' => $key]);
-                $user->setPassword($encoder->encodePassword($user, $MDP));
-                $manager->persist($user);
-            }
-        }
-        $manager->flush();
-        $userList = $repository->findBy(['mdpOublie' => true]);
-        $this->addFlash('success', 'Les mots de passe ont été changé');
-        return $this->render('index/listMDPoublie.html.twig', [
-            'userList' => $userList,
-            'current_menu' => 'reglage'
+    public function selectAllUser(UserRepository $userRepository){
+        $userProf = $userRepository->findBy(['titre' => 'ROLE_PROFESSEUR']);
+
+        $userEleve = $userRepository->findBy(['titre' => 'ROLE_ELEVE']);
+
+        return $this->render('index/listUser.html.twig', [
+            'current_menu' => 'reglage',
+            'listProf' => $userProf,
+            'listEleve' => $userEleve
         ]);
     }
 }

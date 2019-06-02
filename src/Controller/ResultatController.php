@@ -3,25 +3,39 @@
 namespace App\Controller;
 
 use App\Entity\ActivityType;
+use App\Entity\ReponseEleveAssociation;
+use App\Entity\ReponseEleveQCM;
 use App\Entity\ResultSearch;
 use App\Entity\User;
 use App\Form\ResultSearchType;
 use App\Repository\ActivityRepository;
+use App\Repository\QuestionsGroupesRepository;
+use App\Repository\QuestionsReponsesRepository;
+use App\Repository\QuestionsRepository;
 use App\Repository\ReponseEleveAssociationRepository;
 use App\Repository\ReponseEleveQCMRepository;
 use App\Repository\UserActivityRepository;
 use App\Repository\UserRepository;
+use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class ResultatController
+ * @package App\Controller
+ *
+ * Cette classe permet de gérer les résultats des activités
+ */
 class ResultatController extends AbstractController
 {
     /**
+     * Route permettant d'afficher les résultats de l'élève associé au professeur
+     *
      * @Route("/resultats", name="resultat")
      */
-    public function index(UserActivityRepository $userActivityRepository,Request $request)
+    public function resultatsTable(UserActivityRepository $userActivityRepository, Request $request)
     {
         /** @var User $user */
         $user = $this->getUser();
@@ -45,6 +59,8 @@ class ResultatController extends AbstractController
     }
 
     /**
+     * Route permettant de d'afficher les résultats personnels de l'utilisateur
+     *
      * @param UserActivityRepository $userActivityRepository
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
@@ -65,9 +81,11 @@ class ResultatController extends AbstractController
     }
 
     /**
-     * @Route("/resultat/{activityId}/{userId}", name="result_student_activity")
+     * Route permettant d'envoyer les erreurs que l'élève selon l'activité
+     *
+     * @Route("/point/{activityId}/{userId}", name="result_student_activity")
      */
-    public function reponseEleveQCM($userId, $activityId, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityRepository $activityRepository, ReponseEleveAssociationRepository $eleveAssociationRepository){
+    public function reponseEleve($userId, $activityId, ReponseEleveQCMRepository $reponseEleveQCMRepository, ActivityRepository $activityRepository, ReponseEleveAssociationRepository $eleveAssociationRepository){
         $activity = $activityRepository->findOneBy(['id' => $activityId]);
 
         switch($activity->getType()->getName()){
@@ -75,7 +93,7 @@ class ResultatController extends AbstractController
                 $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
 
                 if(empty($responseEleveQCMList)){
-                    $template = 'Ce n\'était pas encore implémenté';
+                    $template = 'Ce n\'était pas encore implémenté ou il n\' a pas d\'erreur';
                 }
                 else{
                     $user = $responseEleveQCMList[0]->getUserId();
@@ -90,7 +108,7 @@ class ResultatController extends AbstractController
             case ActivityType::ASSOCIATION_ACTIVITY :
                 $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $userId, 'activityId' => $activityId]);
                 if(empty($responseEleveAssociationList)){
-                    $template = 'Il n\'y a pas d\'erreur';
+                    $template = 'Ce n\'était pas encore implémenté ou il n\' a pas d\'erreur';
                 }
                 else{
                     $user = $responseEleveAssociationList[0]->getUserId();
@@ -102,11 +120,107 @@ class ResultatController extends AbstractController
                 break;
         }
 
-        $response = new Response('test', 200);
-        $json = json_encode($template);
-        $response = new Response($json, 200);
+        $response = new Response($template, 200);
         //$response->headers->set('Content-Type', 'application/json');
         return $response;
 
+    }
+
+
+    /**
+     * Route permettant de corriger l'activié selon son type
+     *
+     * @param $id
+     * @param Request $request
+     * @param UserActivityRepository $userActivityRepository
+     * @param ObjectManager $manager
+     * @return \Symfony\Component\HttpFoundation\JsonResponse
+     * @Route("{id}/verification", name="correction_groups")
+     */
+    public function verificationActivity($id, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ReponseEleveAssociationRepository $eleveAssociationRepository, QuestionsReponsesRepository $questionsReponsesRepository, QuestionsGroupesRepository $groupesRepository){
+
+        $data = utf8_encode($request->getContent());
+
+        $json = json_decode($data);
+
+        $user = $this->getUser();
+
+        $point = 0;
+
+        $activity = $activityRepository->findOneBy(['id' => $id]);
+
+        $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $id]);
+        $user_activity->setTotal($json->total);
+
+        $responseList = $json->response;
+
+        // enregistrement des mauvaises réponses de l'élève
+        switch ($activity->getType()->getName()){
+            case ActivityType::QCM_ACTIVITY :
+                $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                foreach ($responseEleveQCMList as $response){
+                    $manager->remove($response);
+                }
+                $manager->flush();
+                foreach ($responseList as $response){
+                    $questionId = $questionsRepository->findOneBy(['id' => $response->questionId]);
+                    if($questionId->getBonneReponse1() == $response->value || $questionId->getBonneReponse2() == $response->value || $questionId->getBonneReponse3() == $response->value){
+                        $point++;
+                    }
+                    else{
+                        $point--;
+                        $reponseEleveQCM = new ReponseEleveQCM();
+                        $activityId = $activityRepository->findOneBy(['id' => $id]);
+                        $reponseEleveQCM->setActivityId($activityId);
+                        $reponseEleveQCM->setUserId($user);
+                        $reponseEleveQCM->setQuestionId($questionId);
+                        $reponseEleveQCM->setReponse($response->value);
+                        $manager->persist($reponseEleveQCM);
+                    }
+                }
+                if(is_null($user_activity->getPoint()) || $user_activity->getPoint() < $point){
+                    $user_activity->setPoint($point);
+                }
+                break;
+            case ActivityType::ASSOCIATION_ACTIVITY :
+                //je supprime les réponses déjà existantes
+                $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                foreach ($responseEleveAssociationList as $response){
+                    $manager->remove($response);
+                }
+                $manager->flush();
+
+                foreach($responseList as $response){
+                    $reponseDB = $questionsReponsesRepository->findOneBy(['id' => $response->reponse]);
+                    $groupeDB = $groupesRepository->findOneBy(['id' => $response->groupe]);
+                    if($reponseDB->getQuestion()->getId() == $response->groupe){
+                        $point++;
+                    }
+                    else{
+                        $reponseEleveAssociation = new ReponseEleveAssociation();
+                        $activityId = $activityRepository->findOneBy(['id' => $id]);
+                        $reponseEleveAssociation->setActivityId($activityId);
+                        $reponseEleveAssociation->setUserId($user);
+                        $reponseEleveAssociation->setGroupe($groupeDB->getName());
+                        $reponseEleveAssociation->setReponse($reponseDB->getName());
+                        $manager->persist($reponseEleveAssociation);
+                    }
+                }
+                if(is_null($user_activity->getPoint()) || $user_activity->getPoint() < $point){
+                    $user_activity->setPoint($point);
+                }
+                break;
+        }
+
+        $manager->persist($user_activity);
+        $manager->flush();
+
+        $response = json_encode(['point' => $point, 'total' => $json->total]);
+
+        //Permet de récupérer les données que je passe en ajax.
+        //$total = $json->total;
+
+
+        return $this->json(['code' => 200, 'message' => $response], 200);
     }
 }

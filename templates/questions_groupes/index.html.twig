@@ -12,12 +12,14 @@
 
         {{ form_row(form.name) }}
 
-        <ul class="response" data-prototype="{{ form_widget(form.questionsReponses.vars.prototype) | escape }}">
+        {{ form_row(form.questionsReponses, {'label' : 'Éléments du groupe'}) }}
 
-        </ul>
-
+        {% if slug %}
+            <button type="submit" class="btn btn-primary">Modifier ce groupe</button>
+        {% else %}
         <button type="submit" class="btn btn-primary">Ajouter ce groupe</button>
         <a href="{{ path('activity_' ~ activity.type.name, {'id' : activity.id}) }}" class="btn btn-success">Terminer</a>
+        {% endif %}
         {{ form_end(form) }}
     </div>
 

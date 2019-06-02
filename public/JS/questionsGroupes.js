@@ -5,9 +5,11 @@ var $newLinkLi = $('<li class="list-unstyled"></li>').append($addResponseButton)
 
 $(document).ready(function(){
 
-    $('fieldset.form-group').hide();
+    //$('fieldset.form-group').hide();
 
-    $collectionHolder = $('ul.response');
+    $collectionHolder = $('#questions_groupes_questionsReponses');
+
+    $collectionHolderInput = $('#questions_groupes_questionsReponses input');
 
     $collectionHolder.append($newLinkLi);
 
@@ -15,6 +17,17 @@ $(document).ready(function(){
 
     $addResponseButton.on('click', function (e) {
        addResponseForm($collectionHolder, $newLinkLi);
+    });
+
+    $collectionHolderInput.each(function () {
+        var $removeFormButton = $('<button type="button" class="btn btn-secondary mb-3">Supprimer cette réponse</button>');
+        $removeButton = $removeFormButton[0];
+        this.after($removeButton);
+    });
+
+    var $removeButton = $('.btn-secondary');
+    $removeButton.on('click', function (e) {
+        $(this).parent().remove();
     });
 });
 

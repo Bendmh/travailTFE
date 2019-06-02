@@ -1,11 +1,13 @@
 security:
+    always_authenticate_before_granting: true
     encoders:
         App\Entity\User:
             algorithm: bcrypt
 
     role_hierarchy:
+        ROLE_ELEVE_TEST: [ROLE_ELEVE]
         ROLE_PROFESSEUR: [ROLE_ELEVE]
-        ROLE_SUPER_ADMIN: [ROLE_PROFESSEUR]
+        ROLE_SUPER_ADMIN: [ROLE_PROFESSEUR, ROLE_ELEVE]
 
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:

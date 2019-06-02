@@ -95,6 +95,11 @@ class Questions
      */
     private $reponseEleveQCMs;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $uniqueReponse;
+
     public function __construct()
     {
         $this->reponseEleveQCMs = new ArrayCollection();
@@ -311,6 +316,18 @@ class Questions
                 $reponseEleveQCM->setQuestionId(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUniqueReponse(): ?bool
+    {
+        return $this->uniqueReponse;
+    }
+
+    public function setUniqueReponse(?bool $uniqueReponse): self
+    {
+        $this->uniqueReponse = $uniqueReponse;
 
         return $this;
     }

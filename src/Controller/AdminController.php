@@ -15,12 +15,21 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class AdminController
+ * @package App\Controller
+ *
+ * Ce controller permet de diriger vers les actions de l'admin. Chaque route doit commcencer par /admin pour empêcher d'autres
+ * utilisateurs d'entrer ces URL
+ */
 class AdminController extends AbstractController
 {
     /**
+     * Route pour la listes des types d'activités
+     *
      * @Route("/admin/typeActivity", name="admin_list_type")
      */
-    public function index(ActivityTypeRepository $activityTypeRepository)
+    public function listTypeActivity(ActivityTypeRepository $activityTypeRepository)
     {
         $activity_type = $activityTypeRepository->findAll();
 
@@ -31,13 +40,15 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Route pour la création ou la modification d'un type d'activité
+     *
      * @param Request $request
      * @param ObjectManager $manager
      * @return \Symfony\Component\HttpFoundation\Response
      * @Route("/admin/typeActivity/new", name="new_type_activity")
      * @Route("/admin/typeActivity/{id}/edit", name="edit_type_activity")
      */
-    public function activityType($id = null, Request $request, ObjectManager $manager, ActivityType $activityType = null){
+    public function newOrEditTypeActivity($id = null, Request $request, ObjectManager $manager, ActivityType $activityType = null){
 
         if(!$activityType){
             $activityType = new ActivityType();
@@ -60,6 +71,8 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Route pour supprimer un type d'activité
+     *
      * @param $id
      * @param ActivityTypeRepository $activityTypeRepository
      * @param ObjectManager $manager
@@ -73,6 +86,8 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Route pour la création ou modification d'une classe
+     *
      * @param null $id
      * @param Request $request
      * @param ObjectManager $manager
@@ -81,7 +96,7 @@ class AdminController extends AbstractController
      * @Route("/admin/classe/new", name="new_classe")
      * @Route("/admin/classe/{id}/edit", name="edit_classe")
      */
-    public function addClasses($id = null, Request $request, ObjectManager $manager, Classes $classe = null){
+    public function newOrEditClasses($id = null, Request $request, ObjectManager $manager, Classes $classe = null){
         if(!$classe){
             $classe = new Classes();
         }
@@ -105,6 +120,8 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Route pour la liste des classes au sein de l'école
+     *
      * @Route("/admin/classes", name="admin_list_classes")
      */
     public function listClasses(ClassesRepository $classesRepository)
@@ -118,6 +135,8 @@ class AdminController extends AbstractController
     }
 
     /**
+     * Route pour supprimer une classes de l'école
+     *
      * @param $id
      * @param ActivityTypeRepository $activityTypeRepository
      * @param ObjectManager $manager
@@ -131,23 +150,9 @@ class AdminController extends AbstractController
     }
 
     /**
-     * @param UserRepository $userRepository
-     * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/admin/users", name="list_user")
-     */
-    public function selectAllUser(UserRepository $userRepository){
-        $userProf = $userRepository->findBy(['titre' => 'ROLE_PROFESSEUR']);
-
-        $userEleve = $userRepository->findBy(['titre' => 'ROLE_ELEVE']);
-
-        return $this->render('admin/listUser.html.twig', [
-            'current_menu' => 'reglage',
-            'listProf' => $userProf,
-            'listEleve' => $userEleve
-        ]);
-    }
-
-    /**
+     * Route pour supprimer un utilisateur.
+     * Cela supprime ses résutlats mais permet de garder les activités du profs
+     *
      * @param $id
      * @param UserRepository $userRepository
      * @param ObjectManager $manager
@@ -166,5 +171,22 @@ class AdminController extends AbstractController
         $manager->flush();
 
         return $this->redirectToRoute('list_user');
+    }
+
+    /**
+     * Route pour voir toutes les activités créées même celle non visibles
+     *
+     * @param ActivityRepository $activityRepository
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @Route("/admin/activity/all", name="activity_all")
+     */
+    public function activityAll(ActivityRepository $activityRepository){
+        $activities = $activityRepository->findAll();
+
+        return $this->render('activity/activityList.html.twig', [
+            'activites' => $activities,
+            'current_menu' => 'activity',
+            'perso' => true
+        ]);
     }
 }

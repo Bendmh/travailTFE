@@ -26,13 +26,8 @@ $(document).ready(function(){
         buttonClass = $(this).attr('name');
         responseClass = $collectionResponse.attr('name');
 
-        if(buttonClass === responseClass){
-            $point++;
-        }
-        else {
-            $retour = {'reponse' : $collectionResponse.html(), 'groupe' : buttonClass};
-            $tab.push($retour);
-        }
+        $retour = {'reponse' : responseClass, 'groupe' : buttonClass};
+        $tab.push($retour);
         $collectionResponse.first().remove();
         $collectionResponse = $('h3.response');
         if($collectionResponse.length === 0){
@@ -47,6 +42,9 @@ $(document).ready(function(){
                 $collectionButton.hide();
                 let json = jQuery.parseJSON(response.data.message);
                 $('h3.result').html('Tu as obtenu ' + json.point + ' sur ' + json.total);
+                if(json.point < json.total/2){
+                    $('.lienActivite').removeClass('d-none');
+                }
                 $('h4.enonce').hide();
             })
         }

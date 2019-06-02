@@ -35,34 +35,34 @@
                     <thead>
                         <tr>
                             {% if is_granted('ROLE_PROFESSEUR') %}
-                            <th scope="col">Nom</th>
-                            <th scope="col">Prénom</th>
-                            <th scope="col">Classe</th>
+                                <th scope="col">Nom</th>
+                                <th scope="col">Prénom</th>
+                                {% if current_menu == 'resultat' %}
+                                    <th scope="col">Classe</th>
+                                {% endif %}
                             {% endif %}
                             <th scope="col">Activité</th>
                             <th scope="col">Point</th>
                             <th scope="col">Total</th>
-                            {% if is_granted('ROLE_PROFESSEUR') %}
-                                <th scope="col">Voir ses choix</th>
-                            {% endif %}
+                            <th scope="col">Voir ses choix</th>
                         </tr>
                     </thead>
                     <tbody>
                 {% for result in user_activity %}
                     <tr>
                         {% if is_granted('ROLE_PROFESSEUR') %}
-                        <td>{{ result.userId.nom }}</td>
-                        <td>{{ result.userId.prenom }}</td>
-                        {% for classe in result.userId.classes %}
-                            <td>{{ classe.nom }}</td>
-                        {% endfor %}
+                            <td>{{ result.userId.nom }}</td>
+                            <td>{{ result.userId.prenom }}</td>
+                            {% if current_menu == 'resultat' %}
+                            {% for classe in result.userId.classes %}
+                                <td>{{ classe.nom }}</td>
+                            {% endfor %}
+                            {% endif %}
                         {% endif %}
                         <td>{{ result.activityId.name }}</td>
                         <td>{{ result.point }}</td>
                         <td>{{ result.total }}</td>
-                        {% if is_granted('ROLE_PROFESSEUR') %}
-                            <td><a class="reponseEleve" href="{{ path('result_student_activity', {'activityId' : result.activityId.id, 'userId' : result.userId.id}) }}"><button class="btn btn-info">Réponses</button></a></td>
-                        {% endif %}
+                        <td><a class="reponseEleve" href="{{ path('result_student_activity', {'activityId' : result.activityId.id, 'userId' : result.userId.id}) }}"><button class="btn btn-info">Réponses</button></a></td>
                     </tr>
                 {% endfor %}
                     </tbody>
