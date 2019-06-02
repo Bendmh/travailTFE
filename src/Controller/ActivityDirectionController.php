@@ -10,6 +10,7 @@ namespace App\Controller;
 
 
 use App\Entity\ReponseSondage;
+use App\Entity\User;
 use App\Entity\UserActivity;
 use App\Form\QuestionSondageSelectType;
 use App\Repository\ActivityRepository;
@@ -24,9 +25,17 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Symfony\Component\Routing\Annotation\Route;
 
+/**
+ * Class ActivityDirectionController
+ * @package App\Controller
+ *
+ * Cette classe permet de rediriger vers le bon type d'activité lorsque l'élève veut accomplir une activité
+ */
 class ActivityDirectionController extends AbstractController
 {
     /**
+     * Route renvoyant les données utiles pour un QCM
+     *
      * @Route("/activity/{id}/qcm", name="activity_QCM")
      * @param $id
      * @param ActivityRepository $activityRepository
@@ -69,6 +78,8 @@ class ActivityDirectionController extends AbstractController
     }
 
     /**
+     * Route renvoyant les données utiles pour l'association
+     *
      * @Route("/activity/{id}/association", name="activity_association")
      * @param $id
      * @param ActivityRepository $activityRepository
@@ -76,7 +87,7 @@ class ActivityDirectionController extends AbstractController
      * @param UserActivityRepository $userActivityRepository
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function activityGroups($id, ActivityRepository $activityRepository, QuestionsReponsesRepository $questionsReponsesRepository, ObjectManager $manager, UserActivityRepository $userActivityRepository){
+    public function activityAssociation($id, ActivityRepository $activityRepository, QuestionsReponsesRepository $questionsReponsesRepository, ObjectManager $manager, UserActivityRepository $userActivityRepository){
 
         $user = $this->getUser();
 
@@ -110,11 +121,14 @@ class ActivityDirectionController extends AbstractController
     }
 
     /**
+     * Route renvoyant les données utiles pour un sondage
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      * @Route("/activity/{id}/sondage", name="activity_sondage")
      */
     public function activitySondage($id, ReponseSondageRepository $reponseSondageRepository, ActivityRepository $activityRepository, ObjectManager $manager, QuestionSondageRepository $questionSondageRepository, Request $request){
 
+        /** @var User $user */
         $user = $this->getUser();
 
         if(!$user){
@@ -123,10 +137,11 @@ class ActivityDirectionController extends AbstractController
         }
 
         $activity = $activityRepository->findOneby(['id' => $id]);
-        $slug = $activity->getQuestionSondage()->getId();
+        $questionSondageId = $activity->getQuestionSondage()->getId();
 
-        $questionSondage = $questionSondageRepository->findOneBy(['id' => $slug]);
+        $questionSondage = $questionSondageRepository->findOneBy(['id' => $questionSondageId]);
 
+        //Cette étape permet de vérifier si l'utilisateur a déjà répondu au sondage.
         $reponseSondage = $reponseSondageRepository->findOneBy(['user' => $user->getId(), 'questionSondage' => $questionSondage->getId()]);
 
         if(!is_null($reponseSondage)){
@@ -138,15 +153,21 @@ class ActivityDirectionController extends AbstractController
         $form->handleRequest($request);
 
         if($form->isSubmitted() && $form->isValid()){
+            //récupération de la réponse sélectionner du côté client
             $reponseRequest = $request->request->all()["question_sondage_select"]["repTest"];
-            $reponseSondage = new ReponseSondage();
-            $reponseSondage->setQuestionSondage($questionSondage);
-            $reponseSondage->setResponse($reponseRequest);
-            $reponseSondage->setUser($user);
+            if($activity->getCreatedBy() === $user){
+                $this->addFlash('error', 'En tant que créateur, impossible de voter');
+            }
+            else{
+                $reponseSondage = new ReponseSondage();
+                $reponseSondage->setQuestionSondage($questionSondage);
+                $reponseSondage->setResponse($reponseRequest);
+                $reponseSondage->setUser($user);
 
-            $manager->persist($reponseSondage);
-            $manager->flush();
-            $this->addFlash('success', 'Merci d\'avoir participé à ce sondage');
+                $manager->persist($reponseSondage);
+                $manager->flush();
+                $this->addFlash('success', 'Merci d\'avoir participé à ce sondage');
+        }
             return $this->redirectToRoute('activity');
         }
 
