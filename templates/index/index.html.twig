@@ -21,7 +21,15 @@
         {% endfor %}
     </div>
     <div class="container">
-        <div class="d-block d-sm-none">
+        <div class="row flex">
+            {% for type in activityTypes %}
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3" >
+                    <div style="font-size: 20px" class="mb-2">{{ type.name | upper }}</div>
+                    <img class="w-100" src="{{ vich_uploader_asset(type, 'imageFile') }}" alt="Image type activité">
+                </div>
+            {% endfor %}
+        </div>
+        {#<div class="d-block d-sm-none">
             <ol>
                 {% for type in activityTypes %}
                     <li style="font-size: 20px">{{ type.name | upper }}</li>
@@ -46,7 +54,7 @@
                 </div>
                 {% set index = index+2 %}
             {% endfor %}
-        </div>
+        </div>#}
     </div>
 
 {% endblock %}
