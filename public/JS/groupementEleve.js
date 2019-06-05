@@ -4,11 +4,13 @@ let $point;
 
 let $collectionButton;
 let $total;
+let $compteur;
 
 $(document).ready(function(){
 
     $collectionResponse = $('h3.response');
     $total = $collectionResponse.length;
+    $compteur  = $collectionResponse.length;
 
     $collectionButton = $('button.groups');
 
@@ -20,6 +22,8 @@ $(document).ready(function(){
 
     $point = 0;
 
+    $('#compteur').html($compteur + '/' + $total);
+
     $retour = {};
     $tab = [];
     $collectionButton.on('click', function (e) {
@@ -30,6 +34,8 @@ $(document).ready(function(){
         $tab.push($retour);
         $collectionResponse.first().remove();
         $collectionResponse = $('h3.response');
+        $compteur--;
+        $('#compteur').html($compteur + '/' + $total);
         if($collectionResponse.length === 0){
             $final = $('.final').attr('href');
 
@@ -42,8 +48,12 @@ $(document).ready(function(){
                 $collectionButton.hide();
                 let json = jQuery.parseJSON(response.data.message);
                 $('h3.result').html('Tu as obtenu ' + json.point + ' sur ' + json.total);
+                $('.lienActivite').removeClass('d-none');
                 if(json.point < json.total/2){
-                    $('.lienActivite').removeClass('d-none');
+                    $('.lienActivite').addClass('text-danger');
+                }
+                else{
+                    $('.lienActivite').addClass('text-success');
                 }
                 $('h4.enonce').hide();
             })
