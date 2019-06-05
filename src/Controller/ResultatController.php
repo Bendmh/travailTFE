@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ActivityType;
 use App\Entity\ReponseEleveAssociation;
+use App\Entity\ReponseEleveBrainstorming;
 use App\Entity\ReponseEleveQCM;
 use App\Entity\ResultSearch;
 use App\Entity\User;
@@ -13,6 +14,7 @@ use App\Repository\QuestionsGroupesRepository;
 use App\Repository\QuestionsReponsesRepository;
 use App\Repository\QuestionsRepository;
 use App\Repository\ReponseEleveAssociationRepository;
+use App\Repository\ReponseEleveBrainstormingRepository;
 use App\Repository\ReponseEleveQCMRepository;
 use App\Repository\UserActivityRepository;
 use App\Repository\UserRepository;
@@ -135,9 +137,9 @@ class ResultatController extends AbstractController
      * @param UserActivityRepository $userActivityRepository
      * @param ObjectManager $manager
      * @return \Symfony\Component\HttpFoundation\JsonResponse
-     * @Route("{id}/verification", name="correction_groups")
+     * @Route("{activityId}/verification", name="correction_groups")
      */
-    public function verificationActivity($id, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ReponseEleveAssociationRepository $eleveAssociationRepository, QuestionsReponsesRepository $questionsReponsesRepository, QuestionsGroupesRepository $groupesRepository){
+    public function verificationActivity($activityId, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ReponseEleveAssociationRepository $eleveAssociationRepository, QuestionsReponsesRepository $questionsReponsesRepository, QuestionsGroupesRepository $groupesRepository){
 
         $data = utf8_encode($request->getContent());
 
@@ -147,9 +149,9 @@ class ResultatController extends AbstractController
 
         $point = 0;
 
-        $activity = $activityRepository->findOneBy(['id' => $id]);
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
 
-        $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $id]);
+        $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $activityId]);
         $user_activity->setTotal($json->total);
 
         $responseList = $json->response;
@@ -157,7 +159,7 @@ class ResultatController extends AbstractController
         // enregistrement des mauvaises réponses de l'élève
         switch ($activity->getType()->getName()){
             case ActivityType::QCM_ACTIVITY :
-                $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $activityId]);
                 foreach ($responseEleveQCMList as $response){
                     $manager->remove($response);
                 }
@@ -170,7 +172,7 @@ class ResultatController extends AbstractController
                     else{
                         $point--;
                         $reponseEleveQCM = new ReponseEleveQCM();
-                        $activityId = $activityRepository->findOneBy(['id' => $id]);
+                        $activityId = $activityRepository->findOneBy(['id' => $activityId]);
                         $reponseEleveQCM->setActivityId($activityId);
                         $reponseEleveQCM->setUserId($user);
                         $reponseEleveQCM->setQuestionId($questionId);
@@ -184,7 +186,7 @@ class ResultatController extends AbstractController
                 break;
             case ActivityType::ASSOCIATION_ACTIVITY :
                 //je supprime les réponses déjà existantes
-                $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $activityId]);
                 foreach ($responseEleveAssociationList as $response){
                     $manager->remove($response);
                 }
@@ -198,7 +200,7 @@ class ResultatController extends AbstractController
                     }
                     else{
                         $reponseEleveAssociation = new ReponseEleveAssociation();
-                        $activityId = $activityRepository->findOneBy(['id' => $id]);
+                        $activityId = $activityRepository->findOneBy(['id' => $activityId]);
                         $reponseEleveAssociation->setActivityId($activityId);
                         $reponseEleveAssociation->setUserId($user);
                         $reponseEleveAssociation->setGroupe($groupeDB->getName());
@@ -223,4 +225,24 @@ class ResultatController extends AbstractController
 
         return $this->json(['code' => 200, 'message' => $response], 200);
     }
+
+    /**
+     * @param $activityId
+     * @param ReponseEleveBrainstormingRepository $eleveBrainstormingRepository
+     * @param ActivityRepository $activityRepository
+     * @return Response
+     * @Route("/brainstorming/{activityId}/result", name="brainstorming_result")
+     */
+    public function resultBrainstorming($activityId, ReponseEleveBrainstormingRepository $eleveBrainstormingRepository, ActivityRepository $activityRepository){
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
+        $reponsesEleves = $eleveBrainstormingRepository->findBy(['activity' => $activityId]);
+
+        return $this->render('resultat/resultBrainstorming.html.twig', [
+            'responsesEleves' => $reponsesEleves,
+            'activity' => $activity,
+            'current_menu' => 'resultat'
+        ]);
+    }
+
+
 }

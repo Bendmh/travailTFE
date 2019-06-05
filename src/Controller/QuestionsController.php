@@ -18,15 +18,22 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class QuestionsController
  * @package App\Controller
  *
- * Cette classe permet de gérer les questions de type QCM (création, modification et suppression
+ * Cette classe permet de gérer les questions de type QCM (création, modification et suppression)
  */
 class QuestionsController extends AbstractController
 {
     /**
      * Route permettant la création et la modification de questions (la question est liée à l'activité)
      *
-     * @Route("activity/{id}/questions/new", name="activity_QCM_new")
-     * @Route("activity/{id}/questions/{slug}/edit", name="activity_QCM_edit")
+     * @Route("activity/{activityId}/questions/new", name="activity_QCM_new")
+     * @Route("activity/{activityId}/questions/{slug}/edit", name="activity_QCM_edit")
+     * @param $id
+     * @param null $slug
+     * @param Request $request
+     * @param ObjectManager $manager
+     * @param ActivityRepository $activityRepository
+     * @param QuestionsRepository $questionsRepository
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function newOrEditQuestionsQCM($id, $slug = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository)
     {
@@ -72,15 +79,15 @@ class QuestionsController extends AbstractController
     /**
      * Route permettant la suppression de la question (la question est liée à l'activité)
      *
-     * @Route("activity/{id}/questions/{slug}/delete", name="activity_QCM_delete")
-     * @param $id
+     * @Route("activity/{activityId}/questions/{slug}/delete", name="activity_QCM_delete")
+     * @param $activityId
      * @param $slug
      * @param QuestionsRepository $questionRepository
      * @param ObjectManager $manager
      * @param ReponseEleveQCMRepository $eleveQCMRepository
      * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteQuestionsQCM($id, $slug, QuestionsRepository $questionRepository, ObjectManager $manager, ReponseEleveQCMRepository $eleveQCMRepository){
+    public function deleteQuestionsQCM($activityId, $slug, QuestionsRepository $questionRepository, ObjectManager $manager, ReponseEleveQCMRepository $eleveQCMRepository){
 
         $question = $questionRepository->findOneBy(['id' => $slug]);
         $reponses = $eleveQCMRepository->findBy(['questionId' => $slug]);
@@ -94,6 +101,6 @@ class QuestionsController extends AbstractController
         $manager->flush();
 
 
-        return $this->redirectToRoute('activity_QCM', ['id' => $id]);
+        return $this->redirectToRoute('activity_QCM', ['id' => $activityId]);
     }
 }

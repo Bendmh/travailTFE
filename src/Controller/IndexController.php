@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use App\Entity\ActivityType;
 use App\Entity\Reponses;
 use App\Entity\User;
 use App\Form\AssignClassesType;
@@ -10,6 +11,8 @@ use App\Form\RegistrationType;
 use App\Form\UserChangeDataType;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityTypeRepository;
+use App\Repository\ReponseEleveBrainstormingRepository;
+use App\Repository\ReponseSondageRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class IndexController
  * @package App\Controller
  *
- * Cette classe permet quelques routes pour les utilisateurs
+ * Cette classe permet quelques routes pour les utilisateurs ou routes n'allant pas dans une autre particulièrement
  */
 class IndexController extends AbstractController
 {
@@ -138,4 +141,36 @@ class IndexController extends AbstractController
             'listEleve' => $userEleve
         ]);
     }
+
+    /**
+     * @param $activityType
+     * @param $activityId
+     * @Route("/{activityId}/{activityType}/removeAnswer", name="remove_answer")
+     */
+    public function removeAnswer($activityType, $activityId, ReponseEleveBrainstormingRepository $eleveBrainstormingRepository, ReponseSondageRepository $reponseSondageRepository, ObjectManager $manager, ActivityRepository $activityRepository){
+        switch ($activityType){
+            case ActivityType::BRAINSTORMING_ACTIVITY:
+                $reponsesEleves = $eleveBrainstormingRepository->findBy(['activity' => $activityId]);
+                foreach ($reponsesEleves as $reponse){
+                    $manager->remove($reponse);
+                }
+                $manager->flush();
+                $this->addFlash('success', 'Les données ont bien été réinitialisées');
+                return $this->redirectToRoute('list_brainstorming');
+                break;
+            case ActivityType::SONDAGE_ACTIVITY:
+                $activity = $activityRepository->findOneBy(['id' => $activityId]);
+                $reponsesEleves = $reponseSondageRepository->findBy(['questionSondage' => $activity->getQuestionSondage()->getId()]);
+                foreach ($reponsesEleves as $reponse){
+                    $manager->remove($reponse);
+                }
+                $manager->flush();
+                $this->addFlash('success', 'Les données ont bien été réinitialisées');
+                return $this->redirectToRoute('list_sondage');
+                break;
+
+        };
+        return 0;
+    }
+
 }

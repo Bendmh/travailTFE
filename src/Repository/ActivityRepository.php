@@ -57,14 +57,14 @@ class ActivityRepository extends ServiceEntityRepository
                 ->getResult();
     }
 
-    public function activitySondageByTeacher($id){
+    public function activityByTypeAndByTeacher($id, $type){
         return $this
                 ->createQueryBuilder('p')
                 ->join('p.type', 't')
                 ->andWhere('p.created_by = :creator')
                 ->setParameter('creator', $id)
                 ->andWhere('t.name = :sondage')
-                ->setParameter('sondage', 'sondage')
+                ->setParameter('sondage', $type)
                 ->getQuery()
                 ->getResult();
 

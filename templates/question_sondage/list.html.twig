@@ -10,15 +10,27 @@
                 {{ message }}
             </div>
         {% endfor %}
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
     </div>
     <div class="container">
         <div class="row">
-            <div class="col-12 col-lg-9 col-md-9">
+            <div class="col-12 col-lg-9 col-md-9 col-sm-9">
                 <div class="list-group">
                     {% for activity in activitySondage %}
                         <a href="{{ path('sondage_result', {'id' : activity.id}) }}" class="list-group-item list-group-item-action">{{ activity.name }}</a>
                     {% endfor %}
                 </div>
+            </div>
+            <div class="col-12 col-lg-3 col-md-3 col-sm-3">
+                {% for activity in activitySondage %}
+                    <div class="mb-4">
+                        <a href="{{ path('remove_answer', {'activityId' : activity.id, 'activityType' : activity.type.name}) }}" ><button class="btn btn-danger">Réinitialiser</button></a>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>

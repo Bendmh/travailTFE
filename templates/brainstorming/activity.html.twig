@@ -1,0 +1,37 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Brainstorming{% endblock %}
+
+{% block body %}
+<div class="jumbotron">
+    <h1 name="{{ activity.id }}">{{ brainstorming.subject }}</h1>
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+</div>
+<div class="container">
+    <div class="row">
+        <div class="col-9 col-lg-9 col-md-9">
+            <h4>A quoi te fait penser ce sujet ?</h4>
+            <p>{{ brainstorming.possibilityAnswerNumber }} possiblité(s)</p>
+            {% for i in 1..brainstorming.possibilityAnswerNumber %}
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control response" aria-describedby="inputGroup-sizing-default">
+                </div>
+            {% endfor %}
+            <button id="send" class="btn btn-primary">Envoyer</button>
+            {% if is_granted('ROLE_PROFESSEUR') and activity.createdBy.id == app.user.id %}
+                <a href="{{ path('activity_brainstorming_edit', {'activityId' : activity.id, 'brainstormingId' : brainstorming.id}) }}"><button class="btn btn-secondary">Modifier</button></a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block javascripts %}
+    <script src="/documents/axios.min.js"></script>
+    <script src="/JS/resultBrainstorming.js"></script>
+{% endblock %}

@@ -34,8 +34,8 @@ class QuestionsGroupesController extends AbstractController
      * @param ObjectManager $manager
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
-     * @Route("activity/{id}/association/new", name="activity_association_new")
-     * @Route("activity/{id}/association/{slug}/edit", name="activity_association_edit")
+     * @Route("activity/{activityId}/association/new", name="activity_association_new")
+     * @Route("activity/{activityId}/association/{slug}/edit", name="activity_association_edit")
      */
     public function newOrEditQuestionsGroups($id, $slug = null, ObjectManager $manager, Request $request, ActivityRepository $activityRepository, QuestionsGroupesRepository $groupesRepository, QuestionsReponsesRepository $questionsReponsesRepository){
 
