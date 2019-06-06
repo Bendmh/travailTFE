@@ -89,7 +89,7 @@
             <div class="col-12 col-lg-12 col-md-12">
 
                 <button type="submit" class="btn btn-primary">{% if(question.id) %}Appliquer les modifications{% else %}Ajouter la question{% endif %}</button>
-                {% if not(question.id) %}<a href="{{ path('activity_' ~ activity.type.name, {'id' : activity.id}) }}" class="btn btn-success">Terminer</a>{% endif %}
+                {% if not(question.id) %}<a href="{{ path('activity_' ~ activity.type.name, {'activityId' : activity.id}) }}" class="btn btn-success">Terminer</a>{% endif %}
 
                 {{ form_end(form_quest) }}
             </div>
