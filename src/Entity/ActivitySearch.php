@@ -8,6 +8,8 @@ class ActivitySearch
 
     private $activityName;
 
+    private $activityType;
+
     /**
      * @return mixed
      */
@@ -40,6 +42,22 @@ class ActivitySearch
     public function setActivityName($activityName): void
     {
         $this->activityName = $activityName;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getActivityType()
+    {
+        return $this->activityType;
+    }
+
+    /**
+     * @param mixed $activityType
+     */
+    public function setActivityType($activityType): void
+    {
+        $this->activityType = $activityType;
     }
 
 }

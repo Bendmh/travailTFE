@@ -37,6 +37,12 @@ class ActivityRepository extends ServiceEntityRepository
                 ->setParameter('name', $search->getActivityName());
         }
 
+        if($search->getActivityType()){
+            $query = $query
+                ->andWhere('p.type = :id')
+                ->setParameter('id', $search->getActivityType());
+        }
+
         $query = $query
                 ->andWhere('p.visible = true');
 

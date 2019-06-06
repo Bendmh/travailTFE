@@ -52,6 +52,16 @@ class ActivitySearchType extends AbstractType
                     'class' => 'selectCustom'
                 ]
             ])
+            ->add('activity_type', EntityType::class,[
+                'class' => \App\Entity\ActivityType::class,
+                'choice_label' => 'name',
+                'label' => false,
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Type de l\'activité',
+                    'class' => 'selectCustom'
+                ]
+            ])
         ;
     }
 
