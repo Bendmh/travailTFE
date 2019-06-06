@@ -54,7 +54,7 @@ class IndexController extends AbstractController
      * Route permettant à l'admin ou professeurs d'assigner une classe à un prof (admin) ou élève (prof et admin)
      *
      * @Route("/perso", name="perso")
-     * @Route("/perso/{id}", name="perso_id")
+     * @Route("/prof/perso/{id}", name="perso_id")
      */
     public function pagePerso($id = null, Request $request, ObjectManager $manager, UserRepository $userRepository){
 
@@ -98,10 +98,9 @@ class IndexController extends AbstractController
     /**
      * Route permettant à un professeur de changer son role pour visualiser la plateforme comme un élève
      *
-     * @param $id
      * @param UserRepository $userRepository
      * @param ObjectManager $manager
-     * @Route("/changeRole", name="change_role")
+     * @Route("/prof/changeRole", name="change_role")
      */
     public function changeRole(UserRepository $userRepository, ObjectManager $manager){
         /** @var User $user */
@@ -128,7 +127,7 @@ class IndexController extends AbstractController
      *
      * @param UserRepository $userRepository
      * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/list/users", name="list_user")
+     * @Route("/prof/list/users", name="list_user")
      */
     public function selectAllUser(UserRepository $userRepository){
         $userProf = $userRepository->findBy(['titre' => 'ROLE_PROFESSEUR']);
@@ -143,11 +142,18 @@ class IndexController extends AbstractController
     }
 
     /**
+     * Route permettant de rafraichir les activités de type sondage et brainstorming
+     *
      * @param $activityType
      * @param $activityId
-     * @Route("/{activityId}/{activityType}/removeAnswer", name="remove_answer")
+     * @Route("/prof/{activityId}/{activityType}/removeAnswer", name="remove_answer")
      */
     public function removeAnswer($activityType, $activityId, ReponseEleveBrainstormingRepository $eleveBrainstormingRepository, ReponseSondageRepository $reponseSondageRepository, ObjectManager $manager, ActivityRepository $activityRepository){
+        $user = $this->getUser();
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
         switch ($activityType){
             case ActivityType::BRAINSTORMING_ACTIVITY:
                 $reponsesEleves = $eleveBrainstormingRepository->findBy(['activity' => $activityId]);
@@ -159,7 +165,6 @@ class IndexController extends AbstractController
                 return $this->redirectToRoute('list_brainstorming');
                 break;
             case ActivityType::SONDAGE_ACTIVITY:
-                $activity = $activityRepository->findOneBy(['id' => $activityId]);
                 $reponsesEleves = $reponseSondageRepository->findBy(['questionSondage' => $activity->getQuestionSondage()->getId()]);
                 foreach ($reponsesEleves as $reponse){
                     $manager->remove($reponse);

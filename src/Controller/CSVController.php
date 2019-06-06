@@ -35,7 +35,7 @@ class CSVController extends AbstractController
      *
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \League\Csv\Exception
-     * @Route("/import/csv", name="import_csv")
+     * @Route("/prof/import/csv", name="import_csv")
      */
     public function csvImport(Request $request, ObjectManager $manager){
 
@@ -75,7 +75,7 @@ class CSVController extends AbstractController
      * @param ObjectManager $manager
      * @return \Symfony\Component\HttpFoundation\Response
      * @throws \League\Csv\Exception
-     * @Route("/import/csv/{id}", name="import_csv_id")
+     * @Route("/prof/import/csv/{id}", name="import_csv_id")
      */
     public function csvImportId($id = null, CSV $csv, Request $request, ObjectManager $manager){
 
@@ -139,7 +139,7 @@ class CSVController extends AbstractController
     /**
      * Route permettant la création des activités selon le type correspondant au début de l'import
      *
-     * @Route("/import/csv/{id}/final", name="csv_final")
+     * @Route("/prof/import/csv/{id}/final", name="csv_final")
      * @throws \League\Csv\Exception
      */
     public function csvCreationActivity($id = null, CSV $csv, ObjectManager $manager, ActivityRepository $repository, Request $request, ActivityTypeRepository $activityTypeRepository){
@@ -263,7 +263,7 @@ class CSVController extends AbstractController
      *
      * @param Request $request
      * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/export/csv", name="export_csv")
+     * @Route("/prof/export/csv", name="export_csv")
      * @throws \TypeError
      * @throws \League\Csv\Exception
      */

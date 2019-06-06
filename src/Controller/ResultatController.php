@@ -35,7 +35,7 @@ class ResultatController extends AbstractController
     /**
      * Route permettant d'afficher les résultats de l'élève associé au professeur
      *
-     * @Route("/resultats", name="resultat")
+     * @Route("/prof/resultats", name="resultat")
      */
     public function resultatsTable(UserActivityRepository $userActivityRepository, Request $request)
     {
@@ -68,8 +68,13 @@ class ResultatController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\Response
      * @Route("/points/{id}", name="resultatPerso")
      */
-    public function resultatPerso($id = null, UserActivityRepository $userActivityRepository, Request $request){
+    public function resultatPerso($id, UserActivityRepository $userActivityRepository, Request $request){
 
+        /** @var User $user */
+        $user = $this->getUser();
+        if($id != $user->getId()) {
+            return $this->render('index/error.html.twig');
+        }
         $search = new ResultSearch();
         $form = $this->createForm(ResultSearchType::class, $search);
         $form->handleRequest($request);
@@ -132,7 +137,7 @@ class ResultatController extends AbstractController
     /**
      * Route permettant de corriger l'activié selon son type
      *
-     * @param $id
+     * @param $activityId
      * @param Request $request
      * @param UserActivityRepository $userActivityRepository
      * @param ObjectManager $manager
@@ -141,7 +146,7 @@ class ResultatController extends AbstractController
      */
     public function verificationActivity($activityId, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ReponseEleveAssociationRepository $eleveAssociationRepository, QuestionsReponsesRepository $questionsReponsesRepository, QuestionsGroupesRepository $groupesRepository){
 
-        $data = utf8_encode($request->getContent());
+        $data = $request->getContent();
 
         $json = json_decode($data);
 
@@ -227,15 +232,22 @@ class ResultatController extends AbstractController
     }
 
     /**
+     * Route permettant au prof de voir les résultats de son brainstorming
+     *
      * @param $activityId
      * @param ReponseEleveBrainstormingRepository $eleveBrainstormingRepository
      * @param ActivityRepository $activityRepository
      * @return Response
-     * @Route("/brainstorming/{activityId}/result", name="brainstorming_result")
+     * @Route("/prof/brainstorming/{activityId}/result", name="brainstorming_result")
      */
     public function resultBrainstorming($activityId, ReponseEleveBrainstormingRepository $eleveBrainstormingRepository, ActivityRepository $activityRepository){
+        $user = $this->getUser();
         $activity = $activityRepository->findOneBy(['id' => $activityId]);
         $reponsesEleves = $eleveBrainstormingRepository->findBy(['activity' => $activityId]);
+
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
 
         return $this->render('resultat/resultBrainstorming.html.twig', [
             'responsesEleves' => $reponsesEleves,

@@ -27,8 +27,8 @@ class QuestionSondageController extends AbstractController
     /**
      * Route permettant la création et la modification d'un sondage et la question
      *
-     * @Route("activity/{activityId}/sondage/new", name="activity_sondage_new")
-     * @Route("activity/{activityId}/sondage/{slug}/edit", name="activity_sondage_edit")
+     * @Route("/prof/activity/{activityId}/sondage/new", name="activity_sondage_new")
+     * @Route("/prof/activity/{activityId}/sondage/{slug}/edit", name="activity_sondage_edit")
      */
     public function newOrEditSondage($activityId, $slug = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository, QuestionSondageRepository $questionSondageRepository)
     {
@@ -37,8 +37,11 @@ class QuestionSondageController extends AbstractController
         if(!$questionSondage){
             $questionSondage = new QuestionSondage();
         }
-
+        $user = $this->getUser();
         $activity = $activityRepository->findOneby(['id' => $activityId]);
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
 
         $form = $this->createForm(QuestionSondageNewType::class, $questionSondage);
         $form->handleRequest($request);
@@ -73,7 +76,7 @@ class QuestionSondageController extends AbstractController
      * Route permettant de récupérer les résultats sous forme de texte pour un affichage plus soft
      *
      * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/sondage/{id}/result", name="sondage_result")
+     * @Route("/prof/sondage/{id}/result", name="sondage_result")
      */
     public function resultSondage($id, ReponseSondageRepository $reponseSondageRepository, QuestionSondageRepository $questionSondageRepository, ActivityRepository $activityRepository){
 
@@ -107,12 +110,12 @@ class QuestionSondageController extends AbstractController
     }
 
     /**
-     * Route permettant de construire un graphique à poartir des résultats obtenus
+     * Route permettant de construire un graphique à partir des résultats obtenus
      *
      * @param $id
      * @param ReponseSondageRepository $reponseSondageRepository
      * @param ActivityRepository $activityRepository
-     * @Route("/sondage/{id}/graphique", name="sondage_graphique")
+     * @Route("/prof/sondage/{id}/graphique", name="sondage_graphique")
      */
     public function dataGraphique($id, ReponseSondageRepository $reponseSondageRepository, ActivityRepository $activityRepository){
         $questionSondage = $activityRepository->findOneBy(['id' => $id]);
@@ -125,7 +128,7 @@ class QuestionSondageController extends AbstractController
     /**
      * Route affichant les sondages du professeur
      *
-     * @Route("/sondage/list", name="list_sondage")
+     * @Route("/prof/sondage/list", name="list_sondage")
      */
     public function listSondage(ActivityRepository $activityRepository){
         $userId = $this->getUser()->getId();

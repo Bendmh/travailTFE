@@ -26,18 +26,20 @@ class BrainstormingController extends AbstractController
     /**
      * Route permettant la création et la modification du brainstorming
      *
-     * @Route("/activity/{activityId}/brainstorming/new", name="activity_brainstorming_new")
-     * @Route("/activity/{activityId}/brainstorming/{brainstormingId}/edit", name="activity_brainstorming_edit")
+     * @Route("/prof/activity/{activityId}/brainstorming/new", name="activity_brainstorming_new")
+     * @Route("/prof/activity/{activityId}/brainstorming/{brainstormingId}/edit", name="activity_brainstorming_edit")
      */
     public function newOrEditBrainstorming($activityId, $brainstormingId = null, BrainstormingRepository $brainstormingRepository, ActivityRepository $activityRepository ,Request $request, ObjectManager $manager){
         $brainstorming = $brainstormingRepository->findOneBy(['id' => $brainstormingId]);
-
+        $user = $this->getUser();
         if(!$brainstorming){
             $brainstorming = new Brainstorming();
         }
 
         $activity = $activityRepository->findOneby(['id' => $activityId]);
-
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
         $form = $this->createForm(BrainstormingType::class, $brainstorming);
         $form->handleRequest($request);
 
@@ -63,7 +65,7 @@ class BrainstormingController extends AbstractController
     }
 
     /**
-     * Route permettant de récupérer les résultats des utilisateurs
+     * Route permettant à l'utilisateur d'effectuer l'activité
      *
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      * @Route("/activity/{activityId}/brainstorming", name="activity_brainstorming")
@@ -81,8 +83,6 @@ class BrainstormingController extends AbstractController
 
         $brainstorming = $activity->getQuestionBrainstorming();
 
-        dump($brainstorming);
-
         return $this->render('brainstorming/activity.html.twig', [
             'brainstorming' => $brainstorming,
             'activity' => $activity
@@ -91,7 +91,8 @@ class BrainstormingController extends AbstractController
 
     /**
      * Route affichant les brainstorming du professeur
-     * @Route("brainstorming/list", name="list_brainstorming")
+     *
+     * @Route("/prof/brainstorming/list", name="list_brainstorming")
      */
     public function listBrainstorming(ActivityRepository $activityRepository){
         $userId = $this->getUser()->getId();
@@ -104,11 +105,13 @@ class BrainstormingController extends AbstractController
     }
 
     /**
+     * Route permettant de recevoir les réponses du participant au brainstorming
+     *
      * @param $activityId
      * @Route("/brainstorming/{activityId}/answer", name="answer_brainstorming")
      */
     public function answerFromBrainstorming($activityId, ActivityRepository $activityRepository, Request $request, ReponseEleveBrainstormingRepository $eleveBrainstormingRepository, ObjectManager $manager){
-        $data = utf8_encode($request->getContent());
+        $data = $request->getContent();
 
         $json = json_decode($data);
         /** @var User $user */

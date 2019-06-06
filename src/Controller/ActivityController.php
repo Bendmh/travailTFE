@@ -55,7 +55,7 @@ class ActivityController extends AbstractController
      *
      * @param ActivityRepository $activityRepository
      * @return Response
-     * @Route("/activity/perso", name="activityPerso")
+     * @Route("/prof/activity/perso", name="activityPerso")
      */
     public function showTeacherActivities(ActivityRepository $activityRepository){
 
@@ -71,8 +71,8 @@ class ActivityController extends AbstractController
     /**
      * Route permettant la création et la modification des activités
      *
-     * @Route("/activity/new", name="new_activity")
-     * @Route("/activity/{activityId}/edit", name="edit_activity")
+     * @Route("/prof/activity/new", name="new_activity")
+     * @Route("/prof/activity/{activityId}/edit", name="edit_activity")
      * @param null $activityId
      * @param Request $request
      * @param ObjectManager $manager
@@ -81,9 +81,13 @@ class ActivityController extends AbstractController
     public function newOrEditActivity($activityId = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository){
 
         $activity = $activityRepository->findOneBy(['id' => $activityId]);
+        $user = $this->getUser();
 
         if(!$activity){
             $activity = new Activity();
+        }
+        elseif($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
         }
         $type = $activity->getType();
 
@@ -131,11 +135,16 @@ class ActivityController extends AbstractController
      *
      * @param Activity $activity
      * @param ObjectManager $manager
-     * @Route("/activity/{activityId}/delete", name="delete_activity")
+     * @Route("/prof/activity/{activityId}/delete", name="delete_activity")
      */
     public function deleteActivity($activityId, ActivityRepository $activityRepository, ObjectManager $manager, ReponseEleveAssociationRepository $eleveAssociationRepository, ReponseEleveQCMRepository $eleveQCMRepository){
 
+        $user = $this->getUser();
         $activity = $activityRepository->findOneby(['id' => $activityId]);
+
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
 
         //selon le type d'activité, je dois supprimer les résultats des élèves correspondant à cette activité.
         switch ($activity->getType()->getName()){
