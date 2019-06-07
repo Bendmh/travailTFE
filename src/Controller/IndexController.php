@@ -100,12 +100,16 @@ class IndexController extends AbstractController
      *
      * @param UserRepository $userRepository
      * @param ObjectManager $manager
-     * @Route("/prof/changeRole", name="change_role")
+     * @Route("/changeRole", name="change_role")
      */
     public function changeRole(UserRepository $userRepository, ObjectManager $manager){
         /** @var User $user */
         $user = $this->getUser();
         $role = $user->getTitre();
+
+        if($role == 'ROLE_ELEVE' || $role == 'ROLE_SUPER_ADMIN') {
+            return $this->render('index/error.html.twig');
+        }
 
         if($role == 'ROLE_PROFESSEUR'){
             $user->setTitre('ROLE_ELEVE_TEST');
@@ -176,6 +180,38 @@ class IndexController extends AbstractController
 
         };
         return 0;
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @Route("admin/test", name="test")
+     */
+    public function test(){
+        $sentence = 'Bonjour comment aller-vous ? ';
+        $tab = explode(' ', $sentence);
+        return $this->render('index/test.html.twig', [
+            'tab' => $tab
+        ]);
+    }
+
+    /**
+     * @Route("admin/verifTest", name="verif_test")
+     */
+    public function verifTest(Request $request){
+
+        $data = $request->getContent();
+
+        $json = json_decode($data);
+
+        $response = 'aller-vous';
+        if($json->response == $response){
+            $retour = 'Bravo';
+        }
+        else{
+            $retour = 'Raté';
+        }
+
+        return $this->json(['code' => 200, 'message' => $retour], 200);
     }
 
 }
