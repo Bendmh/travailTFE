@@ -169,22 +169,36 @@ class ResultatController extends AbstractController
                     $manager->remove($response);
                 }
                 $manager->flush();
+                $previousIdQuestion = null;
+                $pointIntermediaire = 0;
+                $questionErrone = false;
                 foreach ($responseList as $response){
                     $questionId = $questionsRepository->findOneBy(['id' => $response->questionId]);
-                    if($questionId->getBonneReponse1() == $response->value || $questionId->getBonneReponse2() == $response->value || $questionId->getBonneReponse3() == $response->value){
-                        $point++;
+
+                    if($previousIdQuestion != $response->questionId){
+                        $questionErrone = false;
+                        $point = $point + $pointIntermediaire;
+                        $pointIntermediaire = 0;
                     }
-                    else{
-                        $point--;
-                        $reponseEleveQCM = new ReponseEleveQCM();
-                        $activityId = $activityRepository->findOneBy(['id' => $activityId]);
-                        $reponseEleveQCM->setActivityId($activityId);
-                        $reponseEleveQCM->setUserId($user);
-                        $reponseEleveQCM->setQuestionId($questionId);
-                        $reponseEleveQCM->setReponse($response->value);
-                        $manager->persist($reponseEleveQCM);
+                    if(!$questionErrone){
+                        if($questionId->getBonneReponse1() == $response->value || $questionId->getBonneReponse2() == $response->value || $questionId->getBonneReponse3() == $response->value){
+                            $pointIntermediaire++;
+                        }
+                        else{
+                            $questionErrone = true;
+                            $pointIntermediaire = 0;
+                            $reponseEleveQCM = new ReponseEleveQCM();
+                            $activityId = $activityRepository->findOneBy(['id' => $activityId]);
+                            $reponseEleveQCM->setActivityId($activityId);
+                            $reponseEleveQCM->setUserId($user);
+                            $reponseEleveQCM->setQuestionId($questionId);
+                            $reponseEleveQCM->setReponse($response->value);
+                            $manager->persist($reponseEleveQCM);
+                        }
                     }
+                    $previousIdQuestion = $response->questionId;
                 }
+                $point = $point + $pointIntermediaire;
                 if(is_null($user_activity->getPoint()) || $user_activity->getPoint() < $point){
                     $user_activity->setPoint($point);
                 }
