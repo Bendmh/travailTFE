@@ -65,10 +65,10 @@ class QuestionsController extends AbstractController
             $manager->flush();
 
             if(!$slug){
-                return $this->redirectToRoute('activity_'. $activity->getType()->getName() .'_new', ['id' => $activity->getId()]);
+                return $this->redirectToRoute('activity_'. $activity->getType()->getName() .'_new', ['activityId' => $activity->getId()]);
             }else{
                 $this->addFlash('success', 'Questions modifiées avec succès');
-                return $this->redirectToRoute('activity_'. $activity->getType()->getName() , ['id' => $activity->getId()]);
+                return $this->redirectToRoute('activity_'. $activity->getType()->getName() , ['activityId' => $activity->getId()]);
             }
 
 
@@ -110,6 +110,6 @@ class QuestionsController extends AbstractController
         $manager->flush();
 
 
-        return $this->redirectToRoute('activity_QCM', ['id' => $activityId]);
+        return $this->redirectToRoute('activity_QCM', ['activityId' => $activityId]);
     }
 }
