@@ -47,7 +47,7 @@ class ResultatController extends AbstractController
             array_push($classesTableau, $classe->getNom());
         }
         $search = new ResultSearch();
-        $form = $this->createForm(ResultSearchType::class, $search);
+        $form = $this->createForm(ResultSearchType::class, $search, ['user' => $user]);
         $form->handleRequest($request);
         $user_activity = $userActivityRepository->findAllVisibleQuery($search, $classesTableau);
         //$user_activity = $userActivityRepository->findAll();
@@ -76,7 +76,7 @@ class ResultatController extends AbstractController
             return $this->render('index/error.html.twig');
         }
         $search = new ResultSearch();
-        $form = $this->createForm(ResultSearchType::class, $search);
+        $form = $this->createForm(ResultSearchType::class, $search, ['user' => $user]);
         $form->handleRequest($request);
         $user_activity = $userActivityRepository->findBy(['user_id' => $id]);
 
