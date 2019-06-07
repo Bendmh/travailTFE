@@ -52,11 +52,13 @@
             {% for activite in activites %}
                 <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3" >
                         <div class="card h-100">
-                            {% if activite.fileName %}
-                                <img class="card-img-top mt-5 mb-5" src="{{ vich_uploader_asset(activite, 'imageFile') }}" alt="Card image cap" style="max-height: 130px">
-                            {% else %}
-                                <img class="card-img-top mt-5 mb-5" src="/images/activity/activity.png" alt="Card image cap" style="max-height: 130px">
-                            {% endif %}
+                            <div class="text-center">
+                                {% if activite.fileName %}
+                                    <img class="card-img-top mt-4" src="{{ vich_uploader_asset(activite, 'imageFile') }}" alt="Card image cap" style="max-height: 144px; width: auto;">
+                                {% else %}
+                                    <img class="card-img-top mt-4" src="/images/activity/activity.png" alt="Card image cap" style="max-height: 144px">
+                                {% endif %}
+                            </div>
                             <div class="card-body text-center">
                                 <h3 class="card-title mb-3">{{ activite.name }}</h3>
                                 <div class="text-center">
