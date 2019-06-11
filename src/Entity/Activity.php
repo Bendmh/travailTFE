@@ -94,6 +94,11 @@ class Activity
     private $questionSondage;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Brainstorming", mappedBy="activity", cascade={"persist", "remove"})
+     */
+    private $questionBrainstorming;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="activityId", cascade={"remove"})
      */
     private $reponseEleveQCMs;
@@ -103,6 +108,11 @@ class Activity
      */
     private $reponseEleveAssociations;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveBrainstorming", mappedBy="activity", cascade={"remove"})
+     */
+    private $reponseEleveBrainstormings;
+
     public function __construct()
     {
         $this->userActivities = new ArrayCollection();
@@ -110,6 +120,7 @@ class Activity
         $this->questionsGroupes = new ArrayCollection();
         $this->reponseEleveQCMs = new ArrayCollection();
         $this->reponseEleveAssociations = new ArrayCollection();
+        $this->reponseEleveBrainstormings = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -382,6 +393,53 @@ class Activity
             // set the owning side to null (unless already changed)
             if ($reponseEleveAssociation->getActivityId() === $this) {
                 $reponseEleveAssociation->setActivityId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQuestionBrainstorming()
+    {
+        return $this->questionBrainstorming;
+    }
+
+    /**
+     * @param mixed $questionBrainstorming
+     */
+    public function setQuestionBrainstorming($questionBrainstorming): void
+    {
+        $this->questionBrainstorming = $questionBrainstorming;
+    }
+
+    /**
+     * @return Collection|ReponseEleveBrainstorming[]
+     */
+    public function getReponseEleveBrainstormings(): Collection
+    {
+        return $this->reponseEleveBrainstormings;
+    }
+
+    public function addReponseEleveBrainstorming(ReponseEleveBrainstorming $reponseEleveBrainstorming): self
+    {
+        if (!$this->reponseEleveBrainstormings->contains($reponseEleveBrainstorming)) {
+            $this->reponseEleveBrainstormings[] = $reponseEleveBrainstorming;
+            $reponseEleveBrainstorming->setActivity($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseEleveBrainstorming(ReponseEleveBrainstorming $reponseEleveBrainstorming): self
+    {
+        if ($this->reponseEleveBrainstormings->contains($reponseEleveBrainstorming)) {
+            $this->reponseEleveBrainstormings->removeElement($reponseEleveBrainstorming);
+            // set the owning side to null (unless already changed)
+            if ($reponseEleveBrainstorming->getActivity() === $this) {
+                $reponseEleveBrainstorming->setActivity(null);
             }
         }
 

@@ -110,6 +110,11 @@ class User implements UserInterface
      */
     private $reponseEleveAssociations;
 
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveBrainstorming", mappedBy="user")
+     */
+    private $reponseEleveBrainstormings;
+
 
     public function __construct()
     {
@@ -120,6 +125,7 @@ class User implements UserInterface
         $this->reponseSondages = new ArrayCollection();
         $this->reponseEleveQCMs = new ArrayCollection();
         $this->reponseEleveAssociations = new ArrayCollection();
+        $this->reponseEleveBrainstormings = new ArrayCollection();
     }
 
     /**
@@ -243,7 +249,7 @@ class User implements UserInterface
     /**
      * @return Collection|Activity[]
      */
-    public function getActivity(): Collection
+    /*public function getActivity(): Collection
     {
         return $this->activity;
     }
@@ -264,7 +270,7 @@ class User implements UserInterface
         }
 
         return $this;
-    }
+    }*/
 
     /**
      * @return Collection|UserActivity[]
@@ -427,6 +433,37 @@ class User implements UserInterface
             // set the owning side to null (unless already changed)
             if ($reponseEleveAssociation->getUserId() === $this) {
                 $reponseEleveAssociation->setUserId(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection|ReponseEleveBrainstorming[]
+     */
+    public function getReponseEleveBrainstormings(): Collection
+    {
+        return $this->reponseEleveBrainstormings;
+    }
+
+    public function addReponseEleveBrainstorming(ReponseEleveBrainstorming $reponseEleveBrainstorming): self
+    {
+        if (!$this->reponseEleveBrainstormings->contains($reponseEleveBrainstorming)) {
+            $this->reponseEleveBrainstormings[] = $reponseEleveBrainstorming;
+            $reponseEleveBrainstorming->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeReponseEleveBrainstorming(ReponseEleveBrainstorming $reponseEleveBrainstorming): self
+    {
+        if ($this->reponseEleveBrainstormings->contains($reponseEleveBrainstorming)) {
+            $this->reponseEleveBrainstormings->removeElement($reponseEleveBrainstorming);
+            // set the owning side to null (unless already changed)
+            if ($reponseEleveBrainstorming->getUser() === $this) {
+                $reponseEleveBrainstorming->setUser(null);
             }
         }
 

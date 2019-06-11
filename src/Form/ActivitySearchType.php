@@ -21,8 +21,8 @@ class ActivitySearchType extends AbstractType
                 'class' => User::class,
                 'query_builder' => function (EntityRepository $er){
                     return $er->createQueryBuilder('u')
-                        ->OrWhere('u.titre <> :titre')
-                        ->setParameter('titre', 'ROLE_ELEVE')
+                        ->OrWhere('u.titre not in (:titre)')
+                        ->setParameter('titre', ['ROLE_ELEVE', 'ROLE_SUPER_ADMIN'])
                         ->orderBy('u.nom', 'ASC');
                 },
                 'choice_label' => function($user, $key, $index) {
@@ -49,6 +49,16 @@ class ActivitySearchType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'placeholder' => 'Nom de l\'activité',
+                    'class' => 'selectCustom'
+                ]
+            ])
+            ->add('activity_type', EntityType::class,[
+                'class' => \App\Entity\ActivityType::class,
+                'choice_label' => 'name',
+                'label' => false,
+                'required' => false,
+                'attr' => [
+                    'placeholder' => 'Type de l\'activité',
                     'class' => 'selectCustom'
                 ]
             ])

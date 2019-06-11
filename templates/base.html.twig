@@ -10,6 +10,7 @@
         <link rel="stylesheet" href="/documents/bootstrap.min.css">
         <link rel="stylesheet" href="/documents/select2.min.css" />
         <link rel="stylesheet" href="/CSS/index.css"/>
+        {#{{ encore_entry_link_tags('app') }}#}
         {#<link rel="stylesheet" href="{{ asset('build/app.css') }}">#}
        {# <link rel="stylesheet" href="http://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css">#}
         {% block stylesheets %}{% endblock %}
@@ -79,6 +80,7 @@
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="{{ path('resultat') }}">Points</a>
                                 <a class="dropdown-item" href="{{ path('list_sondage') }}">Sondages</a>
+                                <a class="dropdown-item" href="{{ path('list_brainstorming') }}">Brainstorming</a>
                             </div>
                         </li>
                         <li class="nav-item {% if current_menu is defined and current_menu == 'reglage' %} active {% endif %} dropdown">
@@ -121,12 +123,16 @@
 
 
         {% block footer %}
+            <div class="clear" style="clear:both"></div>
             <footer>
                 <div class="text-right">Benoit de Mahieu</div>
             </footer>
         {% endblock %}
+        {#{{ encore_entry_script_tags('app') }}#}
 
         <script src="/documents/jquery-3.3.1.slim.min.js"></script>
+        <script src="/documents/jquery-1.12.4.js"></script>
+        <script src="/documents/jquery-ui.js"></script>
         <script src="/documents/popper.min.js"></script>
         <script src="/documents/bootstrap.min.js"></script>
         <script src="/documents/select2.min.js"></script>

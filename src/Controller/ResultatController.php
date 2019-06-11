@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\ActivityType;
 use App\Entity\ReponseEleveAssociation;
+use App\Entity\ReponseEleveBrainstorming;
 use App\Entity\ReponseEleveQCM;
 use App\Entity\ResultSearch;
 use App\Entity\User;
@@ -13,6 +14,7 @@ use App\Repository\QuestionsGroupesRepository;
 use App\Repository\QuestionsReponsesRepository;
 use App\Repository\QuestionsRepository;
 use App\Repository\ReponseEleveAssociationRepository;
+use App\Repository\ReponseEleveBrainstormingRepository;
 use App\Repository\ReponseEleveQCMRepository;
 use App\Repository\UserActivityRepository;
 use App\Repository\UserRepository;
@@ -33,7 +35,7 @@ class ResultatController extends AbstractController
     /**
      * Route permettant d'afficher les résultats de l'élève associé au professeur
      *
-     * @Route("/resultats", name="resultat")
+     * @Route("/prof/resultats", name="resultat")
      */
     public function resultatsTable(UserActivityRepository $userActivityRepository, Request $request)
     {
@@ -45,7 +47,7 @@ class ResultatController extends AbstractController
             array_push($classesTableau, $classe->getNom());
         }
         $search = new ResultSearch();
-        $form = $this->createForm(ResultSearchType::class, $search);
+        $form = $this->createForm(ResultSearchType::class, $search, ['user' => $user]);
         $form->handleRequest($request);
         $user_activity = $userActivityRepository->findAllVisibleQuery($search, $classesTableau);
         //$user_activity = $userActivityRepository->findAll();
@@ -66,10 +68,15 @@ class ResultatController extends AbstractController
      * @return \Symfony\Component\HttpFoundation\Response
      * @Route("/points/{id}", name="resultatPerso")
      */
-    public function resultatPerso($id = null, UserActivityRepository $userActivityRepository, Request $request){
+    public function resultatPerso($id, UserActivityRepository $userActivityRepository, Request $request){
 
+        /** @var User $user */
+        $user = $this->getUser();
+        if($id != $user->getId()) {
+            return $this->render('index/error.html.twig');
+        }
         $search = new ResultSearch();
-        $form = $this->createForm(ResultSearchType::class, $search);
+        $form = $this->createForm(ResultSearchType::class, $search, ['user' => $user]);
         $form->handleRequest($request);
         $user_activity = $userActivityRepository->findBy(['user_id' => $id]);
 
@@ -130,16 +137,16 @@ class ResultatController extends AbstractController
     /**
      * Route permettant de corriger l'activié selon son type
      *
-     * @param $id
+     * @param $activityId
      * @param Request $request
      * @param UserActivityRepository $userActivityRepository
      * @param ObjectManager $manager
      * @return \Symfony\Component\HttpFoundation\JsonResponse
-     * @Route("{id}/verification", name="correction_groups")
+     * @Route("{activityId}/verification", name="correction_groups")
      */
-    public function verificationActivity($id, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ReponseEleveAssociationRepository $eleveAssociationRepository, QuestionsReponsesRepository $questionsReponsesRepository, QuestionsGroupesRepository $groupesRepository){
+    public function verificationActivity($activityId, Request $request, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository, UserActivityRepository $userActivityRepository, ObjectManager $manager, ReponseEleveQCMRepository $reponseEleveQCMRepository, ReponseEleveAssociationRepository $eleveAssociationRepository, QuestionsReponsesRepository $questionsReponsesRepository, QuestionsGroupesRepository $groupesRepository){
 
-        $data = utf8_encode($request->getContent());
+        $data = $request->getContent();
 
         $json = json_decode($data);
 
@@ -147,9 +154,9 @@ class ResultatController extends AbstractController
 
         $point = 0;
 
-        $activity = $activityRepository->findOneBy(['id' => $id]);
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
 
-        $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $id]);
+        $user_activity = $userActivityRepository->findOneby(['user_id' => $this->getUser(), 'activity_id' => $activityId]);
         $user_activity->setTotal($json->total);
 
         $responseList = $json->response;
@@ -157,34 +164,48 @@ class ResultatController extends AbstractController
         // enregistrement des mauvaises réponses de l'élève
         switch ($activity->getType()->getName()){
             case ActivityType::QCM_ACTIVITY :
-                $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                $responseEleveQCMList = $reponseEleveQCMRepository->findBy(['userId' => $user->getId(), 'activityId' => $activityId]);
                 foreach ($responseEleveQCMList as $response){
                     $manager->remove($response);
                 }
                 $manager->flush();
+                $previousIdQuestion = null;
+                $pointIntermediaire = 0;
+                $questionErrone = false;
                 foreach ($responseList as $response){
                     $questionId = $questionsRepository->findOneBy(['id' => $response->questionId]);
-                    if($questionId->getBonneReponse1() == $response->value || $questionId->getBonneReponse2() == $response->value || $questionId->getBonneReponse3() == $response->value){
-                        $point++;
+
+                    if($previousIdQuestion != $response->questionId){
+                        $questionErrone = false;
+                        $point = $point + $pointIntermediaire;
+                        $pointIntermediaire = 0;
                     }
-                    else{
-                        $point--;
-                        $reponseEleveQCM = new ReponseEleveQCM();
-                        $activityId = $activityRepository->findOneBy(['id' => $id]);
-                        $reponseEleveQCM->setActivityId($activityId);
-                        $reponseEleveQCM->setUserId($user);
-                        $reponseEleveQCM->setQuestionId($questionId);
-                        $reponseEleveQCM->setReponse($response->value);
-                        $manager->persist($reponseEleveQCM);
+                    if(!$questionErrone){
+                        if($questionId->getBonneReponse1() == $response->value || $questionId->getBonneReponse2() == $response->value || $questionId->getBonneReponse3() == $response->value){
+                            $pointIntermediaire++;
+                        }
+                        else{
+                            $questionErrone = true;
+                            $pointIntermediaire = 0;
+                            $reponseEleveQCM = new ReponseEleveQCM();
+                            $activityId = $activityRepository->findOneBy(['id' => $activityId]);
+                            $reponseEleveQCM->setActivityId($activityId);
+                            $reponseEleveQCM->setUserId($user);
+                            $reponseEleveQCM->setQuestionId($questionId);
+                            $reponseEleveQCM->setReponse($response->value);
+                            $manager->persist($reponseEleveQCM);
+                        }
                     }
+                    $previousIdQuestion = $response->questionId;
                 }
+                $point = $point + $pointIntermediaire;
                 if(is_null($user_activity->getPoint()) || $user_activity->getPoint() < $point){
                     $user_activity->setPoint($point);
                 }
                 break;
             case ActivityType::ASSOCIATION_ACTIVITY :
                 //je supprime les réponses déjà existantes
-                $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $id]);
+                $responseEleveAssociationList = $eleveAssociationRepository->findBy(['userId' => $user->getId(), 'activityId' => $activityId]);
                 foreach ($responseEleveAssociationList as $response){
                     $manager->remove($response);
                 }
@@ -198,7 +219,7 @@ class ResultatController extends AbstractController
                     }
                     else{
                         $reponseEleveAssociation = new ReponseEleveAssociation();
-                        $activityId = $activityRepository->findOneBy(['id' => $id]);
+                        $activityId = $activityRepository->findOneBy(['id' => $activityId]);
                         $reponseEleveAssociation->setActivityId($activityId);
                         $reponseEleveAssociation->setUserId($user);
                         $reponseEleveAssociation->setGroupe($groupeDB->getName());
@@ -223,4 +244,31 @@ class ResultatController extends AbstractController
 
         return $this->json(['code' => 200, 'message' => $response], 200);
     }
+
+    /**
+     * Route permettant au prof de voir les résultats de son brainstorming
+     *
+     * @param $activityId
+     * @param ReponseEleveBrainstormingRepository $eleveBrainstormingRepository
+     * @param ActivityRepository $activityRepository
+     * @return Response
+     * @Route("/prof/brainstorming/{activityId}/result", name="brainstorming_result")
+     */
+    public function resultBrainstorming($activityId, ReponseEleveBrainstormingRepository $eleveBrainstormingRepository, ActivityRepository $activityRepository){
+        $user = $this->getUser();
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
+        $reponsesEleves = $eleveBrainstormingRepository->findBy(['activity' => $activityId]);
+
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
+
+        return $this->render('resultat/resultBrainstorming.html.twig', [
+            'responsesEleves' => $reponsesEleves,
+            'activity' => $activity,
+            'current_menu' => 'resultat'
+        ]);
+    }
+
+
 }

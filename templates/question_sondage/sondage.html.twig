@@ -21,7 +21,7 @@
                 <h2>{{ activity.questionSondage.question }}</h2>
                 {{ form_start(form_quest) }}
                 {% if is_granted('ROLE_PROFESSEUR') and activity.createdBy.id == app.user.id %}
-                    <a href="{{ path('activity_' ~ activity.type.name ~ '_edit', {'id' : activity.id, 'slug' : activity.questionSondage.id}) }}" class="btn btn-secondary">Modifier</a>
+                    <a href="{{ path('activity_' ~ activity.type.name ~ '_edit', {'activityId' : activity.id, 'slug' : activity.questionSondage.id}) }}" class="btn btn-secondary">Modifier</a>
                 {% endif %}
                 {{ form_row(form_quest.children['repTest']) }}
                 <button class="btn btn-success">Envoyer</button>

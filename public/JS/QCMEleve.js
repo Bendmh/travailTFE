@@ -27,8 +27,12 @@ $(document).ready(function(){
         }).then(function (response) {
             let json = jQuery.parseJSON(response.data.message);
             $('h3.result').html('Tu as obtenu ' + json.point + ' sur ' + json.total);
+            $('.lienActivite').removeClass('d-none');
             if(json.point < json.total/2){
-                $('.lienActivite').removeClass('d-none');
+                $('.lienActivite').addClass('text-danger');
+            }
+            else{
+                $('.lienActivite').addClass('text-success');
             }
             $('.question').hide();
         })

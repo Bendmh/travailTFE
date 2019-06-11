@@ -8,15 +8,17 @@
     </div>
     <div class="container">
         <div class="row">
-            <div class="col-12 col-lg-5 col-md-5">
+            <div class="col-12 col-lg-5 col-md-5 col-sm-4">
                 {% for result in results %}
-                    <p>{{ result[1] }} personne(s) a/ont choisi {{ result['response'] }}</p>
+                    <p class="d-sm-none d-md-block">{{ result[1] }} personne(s) a/ont choisi  {{ result['response'] }}</p>
+                    <p class="d-none d-sm-block d-md-none">{{ result['response'] }} : {{ result[1] }}</p>
                 {% endfor %}
-                <p>{{ total }} personne(s) a/ont participé à ce sondage</p>
+                <p class="d-sm-none d-md-block">{{ total }} personne(s) a/ont participé à ce sondage</p>
+                <p class="d-none d-sm-block d-md-none">Total : {{ total }}</p>
             </div>
-            <div class="col-12 col-lg-7 col-md-7">
+            <div class="col-12 col-lg-7 col-md-7 col-sm-8">
 
-                <canvas id="myChart" width="300" height="300"></canvas>
+                <canvas id="myChart"></canvas>
                {# <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>#}
 
                 {#<div id="div_chart"></div>

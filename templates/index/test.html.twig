@@ -2,27 +2,72 @@
 
 {% block title %}Page de test{% endblock %}
 
+{% block stylesheets %}
+    <style>
+        a {
+            color: #000;
+        }
+        span {
+            cursor: pointer;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <div class="jumbotron">
-        <h1>Test réponses</h1>
+        <h1>Trouvez l'erreur</h1>
+        <p id="retour"></p>
     </div>
 
     <div class="container">
-        {{ form_start(form) }}
+        <h3>Clique sur l'erreur</h3>
+        {% for word in tab %}
+            <span class="word">{{ word }}</span>
+        {% endfor %}
+    </div>
+    <audio controls>
+        <source src="/images/caroline.mp3">
+    </audio>
 
-        {{ form_row(form.name) }}
 
-        <ul class="response" data-prototype="{{ form_widget(form.questionsReponses.vars.prototype) | escape }}">
-
-        </ul>
-
-        <button type="submit" class="btn btn-success">envoyer</button>
-        {{ form_end(form) }}
+    <div id="carouselExampleControls" class="carousel slide" data-ride="carousel">
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <p class="text-center">test1</p>
+            </div>
+            <div class="carousel-item">
+                <p class="text-center">test2</p>
+            </div>
+            <div class="carousel-item">
+                <p class="text-center">test3</p>
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#carouselExampleControls" role="button" data-slide="prev" style="background-color: black">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#carouselExampleControls" role="button" data-slide="next" style="background-color: black">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
     </div>
 
 {% endblock %}
 
 {% block javascripts %}
-    <script src="/JS/questionsGroupes.js"></script>
+    <script src="/documents/axios.min.js"></script>
+    <script>
+        $('#carouselExampleControls').carousel({
+            interval: false
+        });
+        let span = $('span.word');
+        span.on('click', function () {
+            axios.post('/verifTest', {
+                'response' : this.innerHTML
+            }).then(function (response) {
+                    $('#retour').html(response.data.message);
+                });
+        })
+    </script>
 {% endblock %}
 

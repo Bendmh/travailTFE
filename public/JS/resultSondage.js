@@ -3,7 +3,7 @@ $(document).ready(function(){
     let label = [];
     let data = [];
     let id = $('h1').attr('name');
-    let url = '/sondage/' + id + '/graphique';
+    let url = '/prof/sondage/' + id + '/graphique';
     axios.post(url).then(
         function (response) {
             let tab = response.data.message;

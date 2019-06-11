@@ -36,14 +36,14 @@ class ActivityDirectionController extends AbstractController
     /**
      * Route renvoyant les données utiles pour un QCM
      *
-     * @Route("/activity/{id}/qcm", name="activity_QCM")
+     * @Route("/activity/{activityId}/qcm", name="activity_QCM")
      * @param $id
      * @param ActivityRepository $activityRepository
      * @param ObjectManager $manager
      * @param UserActivityRepository $userActivityRepository
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function activityQCM($id, ActivityRepository $activityRepository, ObjectManager $manager, UserActivityRepository $userActivityRepository){
+    public function activityQCM($activityId, ActivityRepository $activityRepository, ObjectManager $manager, UserActivityRepository $userActivityRepository){
 
         $user = $this->getUser();
 
@@ -53,7 +53,7 @@ class ActivityDirectionController extends AbstractController
             return $this->redirectToRoute('activity');
         }
 
-        $activity = $activityRepository->findOneby(['id' => $id]);
+        $activity = $activityRepository->findOneby(['id' => $activityId]);
 
         $user_activity = $userActivityRepository->findOneby(['user_id' => $user, 'activity_id' => $activity->getId()]);
 
@@ -80,14 +80,14 @@ class ActivityDirectionController extends AbstractController
     /**
      * Route renvoyant les données utiles pour l'association
      *
-     * @Route("/activity/{id}/association", name="activity_association")
+     * @Route("/activity/{activityId}/association", name="activity_association")
      * @param $id
      * @param ActivityRepository $activityRepository
      * @param ObjectManager $manager
      * @param UserActivityRepository $userActivityRepository
      * @return \Symfony\Component\HttpFoundation\RedirectResponse|Response
      */
-    public function activityAssociation($id, ActivityRepository $activityRepository, QuestionsReponsesRepository $questionsReponsesRepository, ObjectManager $manager, UserActivityRepository $userActivityRepository){
+    public function activityAssociation($activityId, ActivityRepository $activityRepository, QuestionsReponsesRepository $questionsReponsesRepository, ObjectManager $manager, UserActivityRepository $userActivityRepository){
 
         $user = $this->getUser();
 
@@ -97,9 +97,9 @@ class ActivityDirectionController extends AbstractController
             return $this->redirectToRoute('activity');
         }
 
-        $activity = $activityRepository->findOneby(['id' => $id]);
+        $activity = $activityRepository->findOneby(['id' => $activityId]);
 
-        $answers = $questionsReponsesRepository->findAnswerByActivity($id);
+        $answers = $questionsReponsesRepository->findAnswerByActivity($activityId);
 
         $user_activity = $userActivityRepository->findOneby(['user_id' => $user, 'activity_id' => $activity->getId()]);
 
@@ -124,9 +124,9 @@ class ActivityDirectionController extends AbstractController
      * Route renvoyant les données utiles pour un sondage
      *
      * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/activity/{id}/sondage", name="activity_sondage")
+     * @Route("/activity/{activityId}/sondage", name="activity_sondage")
      */
-    public function activitySondage($id, ReponseSondageRepository $reponseSondageRepository, ActivityRepository $activityRepository, ObjectManager $manager, QuestionSondageRepository $questionSondageRepository, Request $request){
+    public function activitySondage($activityId, ReponseSondageRepository $reponseSondageRepository, ActivityRepository $activityRepository, ObjectManager $manager, QuestionSondageRepository $questionSondageRepository, Request $request){
 
         /** @var User $user */
         $user = $this->getUser();
@@ -136,7 +136,9 @@ class ActivityDirectionController extends AbstractController
             return $this->redirectToRoute('activity');
         }
 
-        $activity = $activityRepository->findOneby(['id' => $id]);
+        $activity = $activityRepository->findOneby(['id' => $activityId]);
+
+        //ces étapes sont inutile je pense => getQuestion rendra directement le bon questionnaire
         $questionSondageId = $activity->getQuestionSondage()->getId();
 
         $questionSondage = $questionSondageRepository->findOneBy(['id' => $questionSondageId]);

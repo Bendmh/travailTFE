@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Liste brainstorming{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>Liste des brainstorming</h1>
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-12 col-lg-9 col-md-9">
+                <div class="list-group">
+                    {% for activity in activityBrainstorming %}
+                        <a href="{{ path('brainstorming_result', {'activityId' : activity.id}) }}" class="list-group-item list-group-item-action">{{ activity.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            <div class="col-12 col-lg-3 col-md-3">
+                {% for activity in activityBrainstorming %}
+                    <div class="mb-4">
+                        <a href="{{ path('remove_answer', {'activityId' : activity.id, 'activityType' : activity.type.name}) }}"><button class="btn btn-danger">Réinitialiser</button></a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

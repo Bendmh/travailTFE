@@ -16,12 +16,12 @@
         <div class="row">
             <div class="col-xs-12 col-lg-7 col-md-7">
                 <h3 class="result"></h3>
-                <a href="{{ path('activity_QCM', { 'id' : activity.id}) }}" class="d-none lienActivite">Refaire l'activité</a>
+                <a href="{{ path('activity_QCM', { 'activityId' : activity.id}) }}" class="d-none lienActivite">Refaire l'activité</a>
                 <div class="question">
                     {% for question in activity.question %}
                         {% if is_granted('ROLE_PROFESSEUR') and activity.createdBy.id == app.user.id %}
-                            <a href="{{ path('activity_' ~ activity.type.name ~ '_edit', {'id' : activity.id, 'slug' : question.id}) }}" class="btn btn-secondary">Modifier</a>
-                            <a href="{{ path('activity_' ~ activity.type.name ~ '_delete', {'id' : activity.id, 'slug' : question.id}) }}" class="btn btn-danger">Supprimer</a>
+                            <a href="{{ path('activity_' ~ activity.type.name ~ '_edit', {'activityId' : activity.id, 'slug' : question.id}) }}" class="btn btn-secondary">Modifier</a>
+                            <a href="{{ path('activity_' ~ activity.type.name ~ '_delete', {'activityId' : activity.id, 'slug' : question.id}) }}" class="btn btn-danger">Supprimer</a>
                         {% endif %}
                         <h2>{{ question.question }}</h2>
                         {% if question.fileName %}
@@ -108,9 +108,9 @@
                         <div class="point text-right d-none">{{ question.points }}</div>
                     {% endfor %}
 
-                    <button href="{{ path('correction_groups', {'id' : activity.id}) }}" class="btn btn-success m-1 final">Envoyer vos réponses</button>
+                    <button href="{{ path('correction_groups', {'activityId' : activity.id}) }}" class="btn btn-success m-1 final">Envoyer vos réponses</button>
                     {% if is_granted('ROLE_PROFESSEUR') and activity.createdBy.id == app.user.id %}
-                        <a href="{{ path('activity_' ~ activity.type.name ~ '_new', {'id' : activity.id}) }}" class="btn btn-info m-1">Ajouter une question</a>
+                        <a href="{{ path('activity_' ~ activity.type.name ~ '_new', {'activityId' : activity.id}) }}" class="btn btn-info m-1">Ajouter une question</a>
                     {% endif %}
                 </div>
 

@@ -19,6 +19,7 @@ class ActivityType
     const QCM_ACTIVITY = 'QCM';
     const ASSOCIATION_ACTIVITY = 'association';
     const SONDAGE_ACTIVITY = 'sondage';
+    const BRAINSTORMING_ACTIVITY = 'brainstorming';
 
     /**
      * @ORM\Id()

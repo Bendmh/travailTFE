@@ -1,0 +1,18 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Resultats{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>{{ activity.questionBrainstorming.subject }}</h1>
+    </div>
+    <div class="container">
+        <div class="row flex">
+            {% for response in responsesEleves %}
+                <div class="col-12 col-lg-3 col-md-4 col-sm-4 text-center">
+                    <p style="background-color: #808080; color: white;" class="draggable p-2 border">{{ response.answer }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

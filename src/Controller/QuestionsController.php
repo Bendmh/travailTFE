@@ -18,25 +18,37 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class QuestionsController
  * @package App\Controller
  *
- * Cette classe permet de gérer les questions de type QCM (création, modification et suppression
+ * Cette classe permet de gérer les questions de type QCM (création, modification et suppression)
  */
 class QuestionsController extends AbstractController
 {
     /**
      * Route permettant la création et la modification de questions (la question est liée à l'activité)
      *
-     * @Route("activity/{id}/questions/new", name="activity_QCM_new")
-     * @Route("activity/{id}/questions/{slug}/edit", name="activity_QCM_edit")
+     * @Route("/prof/activity/{activityId}/questions/new", name="activity_QCM_new")
+     * @Route("/prof/activity/{activityId}/questions/{slug}/edit", name="activity_QCM_edit")
+     * @param $activityId
+     * @param null $slug
+     * @param Request $request
+     * @param ObjectManager $manager
+     * @param ActivityRepository $activityRepository
+     * @param QuestionsRepository $questionsRepository
+     * @return \Symfony\Component\HttpFoundation\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
-    public function newOrEditQuestionsQCM($id, $slug = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository)
+    public function newOrEditQuestionsQCM($activityId, $slug = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository, QuestionsRepository $questionsRepository)
     {
         $question = $questionsRepository->findOneby(['id' => $slug]);
 
         if(!$question){
             $question = new Questions();
         }
+        $user = $this->getUser();
 
-        $activities = $activityRepository->findOneby(['id' => $id]);
+        $activity = $activityRepository->findOneby(['id' => $activityId]);
+
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
 
         $form = $this->createForm(QuestionsType::class, $question);
 
@@ -44,19 +56,19 @@ class QuestionsController extends AbstractController
 
         if($form->isSubmitted() && $form->isValid()){
 
-            $activities = $activityRepository->findOneby(['id' => $id]);
+            $activity = $activityRepository->findOneby(['id' => $activityId]);
 
-            $question->setActivity($activities);
+            $question->setActivity($activity);
 
             $manager->persist($question);
 
             $manager->flush();
 
             if(!$slug){
-                return $this->redirectToRoute('activity_'. $activities->getType()->getName() .'_new', ['id' => $activities->getId()]);
+                return $this->redirectToRoute('activity_'. $activity->getType()->getName() .'_new', ['activityId' => $activity->getId()]);
             }else{
                 $this->addFlash('success', 'Questions modifiées avec succès');
-                return $this->redirectToRoute('activity_'. $activities->getType()->getName() , ['id' => $activities->getId()]);
+                return $this->redirectToRoute('activity_'. $activity->getType()->getName() , ['activityId' => $activity->getId()]);
             }
 
 
@@ -64,7 +76,7 @@ class QuestionsController extends AbstractController
 
         return $this->render('questions/new.html.twig', [
             'form_quest' => $form->createView(),
-            'activity' => $activities,
+            'activity' => $activity,
             'question' => $question
         ]);
     }
@@ -72,16 +84,20 @@ class QuestionsController extends AbstractController
     /**
      * Route permettant la suppression de la question (la question est liée à l'activité)
      *
-     * @Route("activity/{id}/questions/{slug}/delete", name="activity_QCM_delete")
-     * @param $id
+     * @Route("/prof/activity/{activityId}/questions/{slug}/delete", name="activity_QCM_delete")
+     * @param $activityId
      * @param $slug
      * @param QuestionsRepository $questionRepository
      * @param ObjectManager $manager
      * @param ReponseEleveQCMRepository $eleveQCMRepository
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
      */
-    public function deleteQuestionsQCM($id, $slug, QuestionsRepository $questionRepository, ObjectManager $manager, ReponseEleveQCMRepository $eleveQCMRepository){
+    public function deleteQuestionsQCM($activityId, $slug, QuestionsRepository $questionRepository, ObjectManager $manager, ReponseEleveQCMRepository $eleveQCMRepository, ActivityRepository $activityRepository){
 
+        $user = $this->getUser();
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
         $question = $questionRepository->findOneBy(['id' => $slug]);
         $reponses = $eleveQCMRepository->findBy(['questionId' => $slug]);
 
@@ -94,6 +110,6 @@ class QuestionsController extends AbstractController
         $manager->flush();
 
 
-        return $this->redirectToRoute('activity_QCM', ['id' => $id]);
+        return $this->redirectToRoute('activity_QCM', ['activityId' => $activityId]);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 
+use App\Entity\ActivityType;
 use App\Entity\Reponses;
 use App\Entity\User;
 use App\Form\AssignClassesType;
@@ -10,6 +11,8 @@ use App\Form\RegistrationType;
 use App\Form\UserChangeDataType;
 use App\Repository\ActivityRepository;
 use App\Repository\ActivityTypeRepository;
+use App\Repository\ReponseEleveBrainstormingRepository;
+use App\Repository\ReponseSondageRepository;
 use App\Repository\UserRepository;
 use Doctrine\Common\Persistence\ObjectManager;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -21,7 +24,7 @@ use Symfony\Component\Routing\Annotation\Route;
  * Class IndexController
  * @package App\Controller
  *
- * Cette classe permet quelques routes pour les utilisateurs
+ * Cette classe permet quelques routes pour les utilisateurs ou routes n'allant pas dans une autre particulièrement
  */
 class IndexController extends AbstractController
 {
@@ -51,7 +54,7 @@ class IndexController extends AbstractController
      * Route permettant à l'admin ou professeurs d'assigner une classe à un prof (admin) ou élève (prof et admin)
      *
      * @Route("/perso", name="perso")
-     * @Route("/perso/{id}", name="perso_id")
+     * @Route("/prof/perso/{id}", name="perso_id")
      */
     public function pagePerso($id = null, Request $request, ObjectManager $manager, UserRepository $userRepository){
 
@@ -95,7 +98,6 @@ class IndexController extends AbstractController
     /**
      * Route permettant à un professeur de changer son role pour visualiser la plateforme comme un élève
      *
-     * @param $id
      * @param UserRepository $userRepository
      * @param ObjectManager $manager
      * @Route("/changeRole", name="change_role")
@@ -104,6 +106,10 @@ class IndexController extends AbstractController
         /** @var User $user */
         $user = $this->getUser();
         $role = $user->getTitre();
+
+        if($role == 'ROLE_ELEVE' || $role == 'ROLE_SUPER_ADMIN') {
+            return $this->render('index/error.html.twig');
+        }
 
         if($role == 'ROLE_PROFESSEUR'){
             $user->setTitre('ROLE_ELEVE_TEST');
@@ -125,7 +131,7 @@ class IndexController extends AbstractController
      *
      * @param UserRepository $userRepository
      * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/list/users", name="list_user")
+     * @Route("/prof/list/users", name="list_user")
      */
     public function selectAllUser(UserRepository $userRepository){
         $userProf = $userRepository->findBy(['titre' => 'ROLE_PROFESSEUR']);
@@ -138,4 +144,74 @@ class IndexController extends AbstractController
             'listEleve' => $userEleve
         ]);
     }
+
+    /**
+     * Route permettant de rafraichir les activités de type sondage et brainstorming
+     *
+     * @param $activityType
+     * @param $activityId
+     * @Route("/prof/{activityId}/{activityType}/removeAnswer", name="remove_answer")
+     */
+    public function removeAnswer($activityType, $activityId, ReponseEleveBrainstormingRepository $eleveBrainstormingRepository, ReponseSondageRepository $reponseSondageRepository, ObjectManager $manager, ActivityRepository $activityRepository){
+        $user = $this->getUser();
+        $activity = $activityRepository->findOneBy(['id' => $activityId]);
+        if($activity->getCreatedBy() != $user) {
+            return $this->render('index/error.html.twig');
+        }
+        switch ($activityType){
+            case ActivityType::BRAINSTORMING_ACTIVITY:
+                $reponsesEleves = $eleveBrainstormingRepository->findBy(['activity' => $activityId]);
+                foreach ($reponsesEleves as $reponse){
+                    $manager->remove($reponse);
+                }
+                $manager->flush();
+                $this->addFlash('success', 'Les données ont bien été réinitialisées');
+                return $this->redirectToRoute('list_brainstorming');
+                break;
+            case ActivityType::SONDAGE_ACTIVITY:
+                $reponsesEleves = $reponseSondageRepository->findBy(['questionSondage' => $activity->getQuestionSondage()->getId()]);
+                foreach ($reponsesEleves as $reponse){
+                    $manager->remove($reponse);
+                }
+                $manager->flush();
+                $this->addFlash('success', 'Les données ont bien été réinitialisées');
+                return $this->redirectToRoute('list_sondage');
+                break;
+
+        };
+        return 0;
+    }
+
+    /**
+     * @return \Symfony\Component\HttpFoundation\Response
+     * @Route("admin/test", name="test")
+     */
+    public function test(){
+        $sentence = 'Bonjour comment aller-vous ? ';
+        $tab = explode(' ', $sentence);
+        return $this->render('index/test.html.twig', [
+            'tab' => $tab
+        ]);
+    }
+
+    /**
+     * @Route("admin/verifTest", name="verif_test")
+     */
+    public function verifTest(Request $request){
+
+        $data = $request->getContent();
+
+        $json = json_decode($data);
+
+        $response = 'aller-vous';
+        if($json->response == $response){
+            $retour = 'Bravo';
+        }
+        else{
+            $retour = 'Raté';
+        }
+
+        return $this->json(['code' => 200, 'message' => $retour], 200);
+    }
+
 }

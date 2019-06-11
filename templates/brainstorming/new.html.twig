@@ -1,0 +1,33 @@
+{% extends 'base.html.twig' %}
+
+{% form_theme form_brainstorming 'bootstrap_4_layout.html.twig' %}
+
+{% block title %}Brainstorming{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        <h1>{{ activity.name }}</h1>
+    </div>
+    <div class="container">
+        <div class="row">
+            <div class="col-9 col-lg-9 col-md-9">
+                {{ form_start(form_brainstorming) }}
+                {{ form_row(form_brainstorming.subject, {
+                    'attr' : {
+                        'placeholder' : "Sujet (obligatoire)"
+                    },
+                    'label' : 'Sujet du brainstorming'
+                }) }}
+                {{ form_row(form_brainstorming.possibilityAnswerNumber, {
+                    'attr' : {
+                        'placeholder' : "nombre (obligatoire)"
+                    },
+                    'label' : 'Nombre accepté par élève (1-5)'
+                }) }}
+                <button type="submit" class="btn btn-primary">{% if(brainstorming.id) %}Appliquer les modifications{% else %}Ajouter le brainstorming{% endif %}</button>
+                {{ form_end(form_brainstorming) }}
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

@@ -37,6 +37,12 @@ class ActivityRepository extends ServiceEntityRepository
                 ->setParameter('name', $search->getActivityName());
         }
 
+        if($search->getActivityType()){
+            $query = $query
+                ->andWhere('p.type = :id')
+                ->setParameter('id', $search->getActivityType());
+        }
+
         $query = $query
                 ->andWhere('p.visible = true');
 
@@ -57,14 +63,14 @@ class ActivityRepository extends ServiceEntityRepository
                 ->getResult();
     }
 
-    public function activitySondageByTeacher($id){
+    public function activityByTypeAndByTeacher($id, $type){
         return $this
                 ->createQueryBuilder('p')
                 ->join('p.type', 't')
                 ->andWhere('p.created_by = :creator')
                 ->setParameter('creator', $id)
                 ->andWhere('t.name = :sondage')
-                ->setParameter('sondage', 'sondage')
+                ->setParameter('sondage', $type)
                 ->getQuery()
                 ->getResult();
 
