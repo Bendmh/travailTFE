@@ -98,7 +98,7 @@ class BrainstormingController extends AbstractController
         $userId = $this->getUser()->getId();
         $activityBrainstormingTeacher = $activityRepository->activityByTypeAndByTeacher($userId, ActivityType::BRAINSTORMING_ACTIVITY);
 
-        return $this->render('Brainstorming/list.html.twig', [
+        return $this->render('brainstorming/list.html.twig', [
             'activityBrainstorming' => $activityBrainstormingTeacher,
             'current_menu' => 'resultat'
         ]);
