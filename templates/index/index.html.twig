@@ -23,38 +23,12 @@
     <div class="container">
         <div class="row flex">
             {% for type in activityTypes %}
-                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3" >
+                <div class="col-12 col-sm-6 col-md-4 col-lg-4 col-xl-3 mb-3" >
                     <div style="font-size: 20px" class="mb-2">{{ type.name | upper }}</div>
                     <img class="w-100" src="{{ vich_uploader_asset(type, 'imageFile') }}" alt="Image type activité">
                 </div>
             {% endfor %}
         </div>
-        {#<div class="d-block d-sm-none">
-            <ol>
-                {% for type in activityTypes %}
-                    <li style="font-size: 20px">{{ type.name | upper }}</li>
-                    <img class="w-75" src="{{ vich_uploader_asset(type, 'imageFile') }}" alt="Image type activité">
-                {% endfor %}
-            </ol>
-        </div>
-        <div class="d-none d-sm-block">
-            {% set index = 0 %}
-            {% for type in activityTypes | batch(2) %}
-                <div class="row">
-                    <div class="col-sm-6 col-lg-6 col-md-6">
-                        <h3 style="font-size: 20px"><u>{{ type[index+0].name | upper }}</u></h3>
-                        <img style="max-width: 90%; margin-bottom: 15px; margin-top: 10px;" src="{{ vich_uploader_asset(type[index+0], 'imageFile') }}" alt="Image type activité">
-                    </div>
-                    <div class="col-sm-6 col-lg-6 col-md-6">
-                        {% if type[index+1] is defined %}
-                            <h3 style="font-size: 20px"><u>{{ type[index+1].name | upper }}</u></h3>
-                            <img style="max-width: 90%; margin-bottom: 15px; margin-top: 10px;" src="{{ vich_uploader_asset(type[index+1], 'imageFile') }}" alt="Image type activité">
-                        {% endif %}
-                    </div>
-                </div>
-                {% set index = index+2 %}
-            {% endfor %}
-        </div>#}
     </div>
 
 {% endblock %}
