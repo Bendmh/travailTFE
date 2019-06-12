@@ -1,0 +1,27 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Audio{% endblock %}
+
+{% block body %}
+    <div class="jumbotron">
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">
+                {{ message }}
+            </div>
+        {% endfor %}
+        <h1>Activité audio</h1>
+    </div>
+    <div class="container">
+        <div class="col-12 col-md-9 col-sm-7 col-lg-6">
+            <audio controls>
+                <source src={{ vich_uploader_asset(audio, 'audioFile') }}>
+            </audio>
+        </div>
+        {% if is_granted('ROLE_SUPER_ADMIN') or is_granted('ROLE_PROFESSEUR') and activity.createdBy == app.user %}
+            <div class="col-12 col-md-9 col-sm-7 col-lg-6">
+                <a href="{{ path('activity_audio_edit', {'activityId' : activity.id, 'questionAudioId' : audio.id}) }}"><button class="btn btn-secondary">Modifier</button></a>
+            </div>
+        {% endif %}
+    </div>
+
+{% endblock %}
