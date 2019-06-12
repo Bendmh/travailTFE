@@ -99,6 +99,11 @@ class Activity
     private $questionBrainstorming;
 
     /**
+     * @ORM\OneToOne(targetEntity="App\Entity\QuestionAudio", mappedBy="activity", cascade={"persist", "remove"})
+     */
+    private $questionAudio;
+
+    /**
      * @ORM\OneToMany(targetEntity="App\Entity\ReponseEleveQCM", mappedBy="activityId", cascade={"remove"})
      */
     private $reponseEleveQCMs;
@@ -444,5 +449,21 @@ class Activity
         }
 
         return $this;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getQuestionAudio()
+    {
+        return $this->questionAudio;
+    }
+
+    /**
+     * @param mixed $questionAudio
+     */
+    public function setQuestionAudio($questionAudio): void
+    {
+        $this->questionAudio = $questionAudio;
     }
 }
