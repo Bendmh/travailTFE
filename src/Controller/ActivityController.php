@@ -5,6 +5,7 @@ namespace App\Controller;
 
 use App\Entity\Activity;
 use App\Entity\ActivitySearch;
+use App\Entity\User;
 use App\Entity\UserActivity;
 use App\Form\ActivitySearchType;
 use App\Form\ActivityType;
@@ -81,12 +82,13 @@ class ActivityController extends AbstractController
     public function newOrEditActivity($activityId = null, Request $request, ObjectManager $manager, ActivityRepository $activityRepository){
 
         $activity = $activityRepository->findOneBy(['id' => $activityId]);
+        /** @var User $user */
         $user = $this->getUser();
 
         if(!$activity){
             $activity = new Activity();
         }
-        elseif($activity->getCreatedBy() != $user) {
+        elseif($activity->getCreatedBy() !== $user && $user->getTitre() !== 'ROLE_SUPER_ADMIN' ) {
             return $this->render('index/error.html.twig');
         }
         $type = $activity->getType();
