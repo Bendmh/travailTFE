@@ -26,8 +26,9 @@ class MDPController extends AbstractController
      */
     public function mdpOublie(Request $request, UserRepository $repository, ObjectManager $manager){
         $userName = $request->request->get('_username');
+        /** @var User $user */
         $user = $repository->findOneBy(['pseudo' => $userName]);
-        if($user){
+        if($user && $user->getTitre() !== 'ROLE_SUPER_ADMIN'){
             $user->setMdpOublie(true);
             $this->addFlash('success', 'Demande de changement de MDP envoyé');
             $manager->persist($user);
@@ -43,7 +44,7 @@ class MDPController extends AbstractController
      * Route permettant de récupérer tous les utilisateurs ayant oublié son mot de passe
      *
      * @param UserRepository $repository
-     * @Route("/prof/list/MDPoublie", name="MDP_oublie")
+     * @Route("/admin/list/MDPoublie", name="MDP_oublie")
      */
     public function listMDPoublie(UserRepository $repository){
         $userList = $repository->findBy(['mdpOublie' => true]);
@@ -62,7 +63,7 @@ class MDPController extends AbstractController
      * @param UserPasswordEncoderInterface $encoder
      * @param ObjectManager $manager
      * @return \Symfony\Component\HttpFoundation\Response
-     * @Route("/prof/change/MDPoublie", name="change_MDP")
+     * @Route("/admin/change/MDPoublie", name="change_MDP")
      */
     public function changerMDP(Request $request, UserRepository $repository, UserPasswordEncoderInterface $encoder, ObjectManager $manager){
         $userMDPChanged = $request->request;

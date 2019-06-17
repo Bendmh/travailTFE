@@ -88,14 +88,14 @@
                                 Réglages
                             </a>
                             <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                                <a class="dropdown-item" href="{{ path('MDP_oublie') }}">MDP oublié</a>
                                 {% if is_granted('ROLE_SUPER_ADMIN') %}
                                     <a class="dropdown-item" href="{{ path('admin_list_classes') }}">Listes des classes</a>
                                     <a class="dropdown-item" href="{{ path('admin_list_type') }}">Types d'activité</a>
                                     <a class="dropdown-item" href="{{ path('list_user') }}">Liste utilisateurs</a>
+                                    <a class="dropdown-item" href="{{ path('MDP_oublie') }}">MDP oublié</a>
+                                    <a class="dropdown-item" href="{{ path('list_user') }}">Assigner une classe</a>
                                 {% else %}
                                     <a class="dropdown-item" href="{{ path('change_role') }}">Passer étudiant</a>
-                                    <a class="dropdown-item" href="{{ path('list_user') }}">Assigner une classe</a>
                                 {% endif %}
                             </div>
                         </li>
