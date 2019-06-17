@@ -5,6 +5,7 @@ namespace App\Form;
 use App\Entity\Questions;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
@@ -17,10 +18,14 @@ class QuestionsType extends AbstractType
             ->add('imageFile', FileType::class, [
                 'required' => false
             ])
-            ->add('bonneReponse_1')
+            ->add('bonneReponse_1', TextType::class, [
+                'required' => true
+            ])
             ->add('bonneReponse_2')
             ->add('bonneReponse_3')
-            ->add('mauvaiseReponse_1')
+            ->add('mauvaiseReponse_1', TextType::class, [
+                'required' => true
+            ])
             ->add('mauvaiseReponse_2')
             ->add('mauvaiseReponse_3')
             ->add('uniqueReponse')
